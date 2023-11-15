@@ -3,6 +3,7 @@ import './styles/index.css';
 import { Auth, Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
 import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
+import { AudioEngine } from './audio';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -32,7 +33,8 @@ import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerM
 Amplify.configure(amplifyConfig);
 
 // Global variables for scene components
-let camera, scene, renderer, controller, uiGroup;
+
+let camera, audioEngine, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 
@@ -46,6 +48,7 @@ animate();
 function init() {
 	scene = new Scene();
 	setupCamera();
+	setupAudioEngine();
 	setupLighting();
 	setupRenderer();
 	setupARButton();
@@ -117,6 +120,12 @@ function setupMenu() {
     });
 }
 
+/**
+ * Sets up the audio engine. Must be done after the camera is setup.
+ */
+function setupAudioEngine() {
+	audioEngine = new AudioEngine(camera);
+}
 
 /**
  * Sets up the camera for the scene.
@@ -507,8 +516,28 @@ export async function recordAndUploadWebMAudio() {
     }
 }
 
-// (async () => {
-//     //uncomment to immediately test upload
-//     //await recordAndUploadWebMAudio();
-//     await fetchAllAudioFiles();
-// })();
+(async () => {
+    //uncomment to immediately test upload
+    //await recordAndUploadWebMAudio();
+
+    const audioUrls = await fetchAllAudioFiles();
+	for (let audioUrl of audioUrls) {
+		const audioSource = audioEngine.createSource();
+
+		console.log("Fetching audio from " + audioUrl);
+		const response = await fetch(audioUrl);
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		const blob = await response.blob();
+		if (blob.type !== "audio/webm") {
+			throw new Error("Fetched file is not a WebM video. Type is " + blob.type + ".");
+		}
+
+		await audioSource.load(blob);
+
+		// Play back the audio looped forever with a 3 second break between loops.
+		// audioSource.play();
+	}
+})();
