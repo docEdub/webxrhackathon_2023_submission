@@ -31,6 +31,7 @@ Amplify.configure(amplifyConfig);
 let camera, scene, renderer, controller;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
+let primaryAnchor = null;
 
 // Initialize and animate the scene
 init();
@@ -189,6 +190,9 @@ function handleSelectStart() {
 	// 		position: this.hitTestTarget.position.clone(),
 	// 		quaternion: this.hitTestTarget.quaternion.clone(),
 	// 	};
+	// 	// // call a new function
+	// 	// // place box under primary anchor
+	// 	// TODO: createChildBox(anchor, hitTestTarget)
 	// }
 }
 
@@ -308,6 +312,7 @@ function handlePendingAnchors() {
 			)
 			.then((anchor) => {
 				buildAnchorMarker(anchor, false);
+				primaryAnchor = anchor;
 			});
 		pendingAnchorData = null;
 	}
