@@ -13,6 +13,7 @@ GlobalComponent.schema = {
 	renderer: { type: Type.object },
 	camera: { type: Type.object },
 	scene: { type: Type.object },
+	ratk: { type: Type.object },
 	score: { type: Type.int16, default: 0 },
 	gameState: { type: Type.staticString(['lobby', 'ingame']), default: 'lobby' },
 };

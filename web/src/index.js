@@ -31,10 +31,11 @@ const worldDef = {
 
 World.create(worldDef).then((world) => {
 	let ecsexecuting = false;
-	const { scene, camera, renderer } = setupScene();
+	const { scene, camera, renderer, ratk } = setupScene();
 
 	world.createEntity(GlobalComponent, { renderer, camera, scene });
 	renderer.setAnimationLoop(function () {
+		// ratk.update(); // this is making the clear color white?
 		renderer.render(scene, camera);
 		if (ecsexecuting == false) {
 			ecsexecuting = true;

@@ -28,8 +28,13 @@ export class InlineSystem extends System {
 		const webLaunchButton = document.getElementById('web-launch-button');
 		webLaunchButton.style.display = 'none';
 		ARButton.convertToARButton(vrButton, global.renderer, {
-			optionalFeatures: ['local-floor', 'bounded-floor', 'layers'],
-			requiredFeatures: ['hit-test', 'mesh-detection', 'plane-detection'],
+			requiredFeatures: [
+				'anchors',
+				'plane-detection',
+				'hit-test',
+				'mesh-detection',
+				'local-floor',
+			],
 			onUnsupported: () => {
 				vrButton.style.display = 'none';
 				webLaunchButton.style.display = 'block';
