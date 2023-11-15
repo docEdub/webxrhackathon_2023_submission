@@ -23,43 +23,21 @@ export class Main {
   constructor(scope: cdk.Stack, contextValues: any) {
     //Make S3 Bucket
     const storageBucket = new S3Bucket(scope, "StorageBucket", cdk.RemovalPolicy.DESTROY);
-    //DynamoDB Database
-    const leaderboardDatabase = new DDBTable(scope, "LeaderboardDatabase", "playerId", undefined, BillingMode.PAY_PER_REQUEST, cdk.RemovalPolicy.DESTROY);
-    
-    // Add Global Secondary Index to Leaderboard Database for Ranking queries
-    leaderboardDatabase.addGlobalSecondaryIndex({
-      indexName: 'rankingIndex',
-      partitionKey: {
-        name: 'status',
-        type: ddb.AttributeType.NUMBER
-      },
-      sortKey: {
-        name: 'score',
-        type: ddb.AttributeType.NUMBER
-      }
-    })
 
     //Lambda layer
     const storageEnvs = {
       BUCKET_NAME: storageBucket.bucketName
     };
 
-    const highScoreEnvs = {
-      TABLE_NAME: leaderboardDatabase.tableName
-    }
-
     //Make Nested Lambda Stack(s)
-    const getAssetLambda = new LambdaStack(scope, "getAssetLambda", cdk.aws_lambda.Runtime.NODEJS_18_X, '../lambdaScripts/getAsset', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
-
-    const getHighScoreLambda = new LambdaStack(scope, "getPlayerInfoLambda", cdk.aws_lambda.Runtime.NODEJS_18_X, '../lambdaScripts/getPlayerInfo', 'handler', cdk.Duration.minutes(5), 512, 512, highScoreEnvs);
-    const putHighScoreLambda = new LambdaStack(scope, "putPlayerRecordLambda", cdk.aws_lambda.Runtime.NODEJS_18_X, '../lambdaScripts/putPlayerRecord', 'handler', cdk.Duration.minutes(5), 512, 512, highScoreEnvs);
+    const getAssetLambda = new LambdaStack(scope, "getAssetLambda", cdk.aws_lambda.Runtime.NODEJS_18_X,
+     '../lambdaScripts/getAsset', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
+    const putAssetLambda = new LambdaStack(scope, "putAssetLambda", cdk.aws_lambda.Runtime.NODEJS_18_X,
+    '../lambdaScripts/putAsset', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
 
     //Grant Lambda functions read/write access to S3 bucket
-    storageBucket.grantReadWrite(getAssetLambda.lambdaFunction);
-
-    //Grant Lambda functions read/write access to DDB table
-    leaderboardDatabase.grantReadData(getHighScoreLambda.lambdaFunction);
-    leaderboardDatabase.grantReadWriteData(putHighScoreLambda.lambdaFunction);
+    storageBucket.grantRead(getAssetLambda.lambdaFunction);
+    storageBucket.grantReadWrite(putAssetLambda.lambdaFunction);
 
     //Build Cognito Stack
     const cognitoStack = new CognitoStack(scope, "auth", true, true);
@@ -69,8 +47,7 @@ export class Main {
     const apiAuthorizer = apiGateway.AddCognitoAuthorizer(scope, "API_Authorizer", [cognitoStack.userPool])
 
     apiGateway.AddMethodIntegration(getAssetLambda.MethodIntegration(), "assets", "GET", apiAuthorizer);
-    apiGateway.AddMethodIntegration(putHighScoreLambda.MethodIntegration(), "leaderboard", "POST", apiAuthorizer);
-    apiGateway.AddMethodIntegration(getHighScoreLambda.MethodIntegration(), "leaderboard/{playerId}", "GET", apiAuthorizer);
+    apiGateway.AddMethodIntegration(putAssetLambda.MethodIntegration(), "assets", "PUT", apiAuthorizer);
 
     //Upload Website
     const website = new WebSiteDeployment(scope, "webDeployment", '../../web/dist', 'index.html', apiGateway, storageBucket);

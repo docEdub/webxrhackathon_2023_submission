@@ -3,7 +3,7 @@ import amplifyConfig from './amplifyconfigure';
 
 const API_GATEWAY_URL = amplifyConfig.Api.url + 'assets';
 
-export async function fetchPreSignedUrl(assetKey) {
+export async function fetchPreSignedUrl(assetKey, action = 'GET') {
     try {
         const session = await Auth.currentSession();
         const idToken = session.getIdToken().getJwtToken();
@@ -15,7 +15,7 @@ export async function fetchPreSignedUrl(assetKey) {
             Authorization: idToken,
             'Content-Type': 'application/json',
             },
-           method: 'GET',
+           method: action,
         });
         const responseData = await response.json();
         console.log("response is" + JSON.stringify(responseData, null, 2));
@@ -25,3 +25,5 @@ export async function fetchPreSignedUrl(assetKey) {
         throw err;
     }
 }
+
+export default fetchPreSignedUrl;

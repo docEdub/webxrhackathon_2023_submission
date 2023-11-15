@@ -130,4 +130,6 @@ dist
 .pnp.*
 
 .DS_Store
-/.idea/
+/.idea
+
+web/src/amplifyconfigure.js

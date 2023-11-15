@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 .DS_Store
+
+# Ignore config file updates since it should be modified for each local dev environment
+amplifyconfigure.js
