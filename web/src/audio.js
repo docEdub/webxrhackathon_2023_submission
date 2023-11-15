@@ -24,11 +24,15 @@ export class AudioEngine {
         }
     }
 
-    createSource() {
-        const source = new AudioSource(this);
+    createSource(id) {
+        const source = new AudioSource(this, id);
         this._sources.push(source);
         source.getOutputNode().connect(this._destinationNode);
         return source;
+    }
+
+    getSourceById(id) {
+        return this._sources.find(source => source._id === id);
     }
 
     async createRecording() {
@@ -97,8 +101,10 @@ export class AudioListener {
 }
 
 export class AudioSource {
-    constructor(audioEngine) {
+    constructor(audioEngine, id) {
         this._audioEngine = audioEngine;
+        this._id = id;
+
         this._position = new Vector3();
 
         this._gainNode = new GainNode(this._audioEngine.audioContext);
