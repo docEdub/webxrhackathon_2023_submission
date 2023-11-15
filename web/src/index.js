@@ -37,6 +37,7 @@ Amplify.configure(amplifyConfig);
 let camera, audioEngine, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
+let primaryAnchor = null;
 
 // Initialize and animate the scene
 init();
@@ -249,22 +250,35 @@ function handleControllerDisconnected() {
  * Handles 'selectstart' event for the controller.
  */
 function handleSelectStart() {
-	if (this.hitTestTarget) {
-		pendingAnchorData = {
-			position: this.hitTestTarget.position.clone(),
-			quaternion: this.hitTestTarget.quaternion.clone(),
-		};
-	}
+	// if (this.hitTestTarget) {
+	// 	pendingAnchorData = {
+	// 		position: this.hitTestTarget.position.clone(),
+	// 		quaternion: this.hitTestTarget.quaternion.clone(),
+	// 	};
+	// 	// // call a new function
+	// 	// // place box under primary anchor
+	// 	// TODO: createChildBox(anchor, hitTestTarget)
+	// }
 }
 
 /**
  * Handles 'squeezestart' event for the controller.
  */
 function handleSqueezeStart() {
+	// delete old anchors
 	ratk.anchors.forEach((anchor) => {
 		console.log(anchor.anchorID);
 		ratk.deleteAnchor(anchor);
 	});
+
+	// Clone the camera position and set y-coordinate to 0
+	const positionClone = camera.position.clone();
+	positionClone.y = 0;
+	
+	pendingAnchorData = {
+		position: positionClone,
+		quaternion: camera.quaternion.clone(),
+	};
 }
 
 /**
@@ -390,6 +404,7 @@ function handlePendingAnchors() {
 			)
 			.then((anchor) => {
 				buildAnchorMarker(anchor, false);
+				primaryAnchor = anchor;
 			});
 		pendingAnchorData = null;
 	}
