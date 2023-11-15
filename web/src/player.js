@@ -11,6 +11,8 @@ import { System, Type } from '@lastolivegames/becsy';
 import { GamepadWrapper } from 'gamepad-wrapper';
 import { GlobalComponent } from './global';
 
+import { ControllersSystem } from './controllers';
+
 // import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory';
 
 export class PlayerComponent {}
@@ -28,6 +30,8 @@ export class PlayerSystem extends System {
 		this.playerEntity = this.query(
 			(q) => q.current.with(PlayerComponent).write,
 		);
+		this.schedule((s) => s.after(ControllersSystem));
+
 		this._vec3 = new Vector3();
 	}
 

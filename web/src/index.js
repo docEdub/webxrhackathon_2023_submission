@@ -11,6 +11,7 @@ import amplifyConfig from './amplifyconfigure';
 
 import { PlayerComponent, PlayerSystem } from './player';
 
+import { ControllersSystem } from './controllers';
 import { GameSystem } from './game';
 import { GlobalComponent } from './global';
 import { InlineSystem } from './landing';
@@ -23,6 +24,7 @@ const worldDef = {
 	defs: [
 		GlobalComponent,
 		PlayerComponent,
+		ControllersSystem,
 		PlayerSystem,
 		InlineSystem,
 		GameSystem,
@@ -31,7 +33,7 @@ const worldDef = {
 
 World.create(worldDef).then((world) => {
 	let ecsexecuting = false;
-	const { scene, camera, renderer, ratk } = setupScene();
+	const { scene, camera, renderer, /*ratk*/ } = setupScene();
 
 	world.createEntity(GlobalComponent, { renderer, camera, scene });
 	renderer.setAnimationLoop(function () {
