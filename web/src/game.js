@@ -83,12 +83,10 @@ export class GameSystem extends System {
 		});
 	}
 
-	/* uncomment this code for workshop step 3.3 
 	async prepare() {
 			const session = await Auth.currentSession();
 			this.ID_TOKEN = session.getIdToken().getJwtToken();
     }
-	*/
 
 	execute() {
 		const global = this.globalEntity.current[0].write(GlobalComponent);
@@ -245,7 +243,7 @@ export class GameSystem extends System {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				//Authorization: `Bearer ${this.ID_TOKEN}`  // uncomment this line for workshop step 3.4 
+				Authorization: `Bearer ${this.ID_TOKEN}`  // uncomment this line for workshop step 3.4
 			}
 		})
 		.then(response => response.text())
@@ -296,4 +294,3 @@ const createText = (defaultValue) => {
 	text.position.z = 0.001;
 	return text;
 };
-

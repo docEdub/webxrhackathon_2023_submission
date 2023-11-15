@@ -6,14 +6,13 @@ import './styles/auth.css';
 Amplify.configure(amplifyConfig);
 
 // Get message div
-const messageDiv = document.getElementById('message'); 
+const messageDiv = document.getElementById('message');
 
 const handleSignUp = async () => {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const email = document.getElementById('email').value; // If using email
 
-    /** uncomment this code for workshop step 3.1 
     try {
         const { user } = await Auth.signUp({
             username,
@@ -24,7 +23,7 @@ const handleSignUp = async () => {
         });
         console.log('Sign up success!', user);
         // Handle successful sign-up logic here
-        // Displaying success message 
+        // Displaying success message
         showMessage('Sign up successful! Please use the same username and password to sign in', 'success');
     } catch (error) {
         console.error('Error signing up:', error);
@@ -33,13 +32,10 @@ const handleSignUp = async () => {
     }
 };
 
-*/ 
-
 const handleSignIn = async () => {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    /** Uncomment these lines of code for workshop step 3.2 
     try {
         const user = await Auth.signIn(username, password);
         console.log('Sign in success!', user);
@@ -47,13 +43,13 @@ const handleSignIn = async () => {
         await new Promise(resolve => setTimeout(resolve, 1000));  // wait for a second
         const session = await Auth.currentSession();
         console.log("session is", session);
-    
+
         window.location.href = "main.html";
     } catch (error) {
         console.error('Error signing in:', error);
     }
 };
-*/
+
 const showMessage = (message, type) => {
     messageDiv.innerText = message;
     messageDiv.className = type;  // 'success' or 'error'

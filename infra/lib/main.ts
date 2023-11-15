@@ -25,7 +25,7 @@ export class Main {
     const storageBucket = new S3Bucket(scope, "StorageBucket", cdk.RemovalPolicy.DESTROY);
     //DynamoDB Database
     const leaderboardDatabase = new DDBTable(scope, "LeaderboardDatabase", "playerId", undefined, BillingMode.PAY_PER_REQUEST, cdk.RemovalPolicy.DESTROY);
-    
+
     // Add Global Secondary Index to Leaderboard Database for Ranking queries
     leaderboardDatabase.addGlobalSecondaryIndex({
       indexName: 'rankingIndex',
@@ -58,15 +58,13 @@ export class Main {
 
     //Build Cognito Stack
     const cognitoStack = new CognitoStack(scope, "auth", true, true);
-  
+
     //Build API Gateway
     const apiGateway = new restGatewayNestedStack(scope, "gateway", "Main Stack Gateway", "dev").gateway;
 
-    /** Workshop two step 1.1, uncomment this code block to enable API Gateway with a Cognito authorizer enabled 
     const apiAuthorizer = apiGateway.AddCognitoAuthorizer(scope, "API_Authorizer", [cognitoStack.userPool])
     apiGateway.AddMethodIntegration(putHighScoreLambda.MethodIntegration(), "leaderboard", "POST", apiAuthorizer);
     apiGateway.AddMethodIntegration(getHighScoreLambda.MethodIntegration(), "leaderboard/{playerId}", "GET", apiAuthorizer);
-    */
 
     //Upload Website
     const website = new WebSiteDeployment(scope, "webDeployment", '../../web/dist', 'index.html', apiGateway, storageBucket);
