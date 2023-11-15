@@ -8,14 +8,11 @@
 import {
 	DirectionalLight,
 	HemisphereLight,
-	PMREMGenerator,
 	PerspectiveCamera,
 	Scene,
 	WebGLRenderer,
 	sRGBEncoding,
 } from 'three';
-
-import {loadAsset} from './fetchurl';
 
 export const setupScene = () => {
 	const scene = new Scene();
@@ -38,34 +35,8 @@ export const setupScene = () => {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.outputEncoding = sRGBEncoding;
 	renderer.xr.enabled = true;
+	renderer.setClearAlpha(0);
 	document.body.appendChild(renderer.domElement);
-
-	const pmremGenerator = new PMREMGenerator(renderer);
-	pmremGenerator.compileEquirectangularShader();
-
-	// new EXRLoader().load('assets/venice_sunset_1k.exr', (texture) => {
-	// 	const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-	// 	pmremGenerator.dispose();
-	// 	scene.environment = envMap;
-	// });
-
-	/** Uncomment this to change this asset loading from  local asset to loading from S3
-	 * workshop three step two */
-	loadAsset('exr', 'assets/venice_sunset_1k.exr', (texture) => {
-		const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-		pmremGenerator.dispose();
-		scene.environment = envMap;
-	})
-
-    /** Uncomment this to change this asset loading from  local asset to loading from S3
-	 * workshop three step two */
-	loadAsset('gltf','assets/flappybird.glb', (gltf) => {
-		scene.add(gltf.scene);
-	})
-
-	// new GLTFLoader().load('assets/flappybird.glb', (gltf) => {
-	// scene.add(gltf.scene);
-	// });
 
 	window.addEventListener('resize', function () {
 		camera.aspect = window.innerWidth / window.innerHeight;
