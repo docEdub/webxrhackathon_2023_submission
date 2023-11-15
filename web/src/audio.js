@@ -5,15 +5,19 @@ import {
 } from "three";
 
 export class AudioEngine {
-    constructor(xr) {
+    constructor(camera) {
+        this._camera = camera;
+
         this.audioContext = new AudioContext();
         this.listener = new AudioListener(this);
 
-        this._destinationNode = this.audioContext.destination;
         this._rampDuration = 0.25; // seconds
         this._recordingDuration = 10; // seconds
+
         this._sources = [];
-        this._xr = xr;
+
+        this._masterGainNode = new GainNode(this.audioContext, { gain: 0.1 });
+        this._destinationNode = this.audioContext.destination;
 
         document.onclick = () => {
             this.audioContext.resume();
@@ -43,8 +47,13 @@ export class AudioEngine {
         return this.audioContext.currentTime + this._rampDuration;
     }
 
-    update() {
+    setMasterVolume(volume) {
+        this._masterGainNode.gain.linearRampToValueAtTime(volume, this.getRampTime());
+    }
 
+    update() {
+        this.listener.setPosition(this._camera.position);
+        this.listener.setOrientation(this._camera.quaternion);
     }
 }
 
@@ -101,9 +110,11 @@ export class AudioSource {
     async load(blob) {
         this._blob = blob;
 
-        const arrayBuffer = await blob.arrayBuffer();
-        const audioBuffer = await this._audioEngine.audioContext.decodeAudioData(arrayBuffer);
-        this._audioBufferSourceNode = new AudioBufferSourceNode(this._audioEngine.audioContext, { buffer: audioBuffer });
+        if (!this._audioBuffer) {
+            const arrayBuffer = await blob.arrayBuffer();
+            this._audioBuffer = await this._audioEngine.audioContext.decodeAudioData(arrayBuffer);
+        }
+        this._audioBufferSourceNode = new AudioBufferSourceNode(this._audioEngine.audioContext, { buffer: this._audioBuffer });
         this._audioBufferSourceNode.connect(this._gainNode);
     }
 
@@ -123,9 +134,18 @@ export class AudioSource {
 
     play() {
         this._audioBufferSourceNode.start();
+        this._audioBufferSourceNode.onended = () => {
+            this._loopTimeoutId = setTimeout(async () => {
+                console.log("Looping audio");
+                await this.load(this._blob);
+                this.play();
+            }, 3000);
+        };
     }
 
     stop() {
+        this._audioBufferSourceNode.onended = null;
+        clearTimeout(this._loopTimeoutId);
         this._audioBufferSourceNode.stop();
     }
 }

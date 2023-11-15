@@ -1,1 +1,0 @@
-Placeholder to keep this directory. Delete this file and add assets for project when available.

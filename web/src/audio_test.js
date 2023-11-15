@@ -12,12 +12,13 @@ import {
 	SphereGeometry,
 	WebGLRenderer,
 } from 'three';
-import * as Tone from 'tone';
 
 import { Text } from 'troika-three-text';
 
+import { AudioEngine } from './audio';
+
 // Global variables for scene components
-let camera, scene, renderer, sphere;
+let camera, scene, renderer, audioEngine, sphere, sphereSound;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 
@@ -37,6 +38,7 @@ function init() {
 	setupCamera();
 	setupLighting();
 	setupRenderer();
+	setupAudioEngine();
 	setupARButton();
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
@@ -57,6 +59,25 @@ function setupScene() {
 
 	// Camera position
 	camera.position.z = 5;
+
+	sphereSound = audioEngine.createSource();
+
+	(async () => {
+		const response = await fetch("assets/example.webm");
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		const blob = await response.blob();
+		if (blob.type !== "video/webm") {
+			throw new Error("Fetched file is not a WebM video");
+		}
+
+		await sphereSound.load(blob);
+		console.log("Loaded audio");
+
+		sphereSound.play();
+	})();
 }
 
 function animateSphere() {
@@ -65,6 +86,7 @@ function animateSphere() {
     if (sphere.position.x > 10 || sphere.position.x < -10) {
         direction *= -1; // Change direction
     }
+	sphereSound.setPosition(sphere.position);
 }
 
 /**
@@ -103,6 +125,10 @@ function setupRenderer() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.xr.enabled = true;
 	document.body.appendChild(renderer.domElement);
+}
+
+function setupAudioEngine() {
+	audioEngine = new AudioEngine(camera);
 }
 
 /**
@@ -199,6 +225,7 @@ function render() {
 	animateSphere();
 	handlePendingAnchors();
 	ratk.update();
+	audioEngine.update();
 	updateSemanticLabels();
 	renderer.render(scene, camera);
 }
@@ -231,12 +258,6 @@ function buildAnchorMarker(anchor, isRecovered) {
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
 	);
-	const synth = new Tone.Synth().toDestination();
-	// const now = Tone.now()
-	const notes = ["C4", "E4", "G4"];
-	const randomIndex = Math.floor(Math.random() * notes.length);
-	const randomNote = notes[randomIndex];
-	synth.triggerAttack(randomNote, "8n")
 }
 
 /**

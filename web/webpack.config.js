@@ -52,9 +52,9 @@ module.exports = {
 			filename: 'audio_test.html',
 			chunks: ['audio_test']
 		}),
-//		new CopyPlugin({
-//			patterns: [{ from: 'src/assets', to: 'assets' }],
-//		}),
+		new CopyPlugin({
+			patterns: [{ from: 'src/assets', to: 'assets' }],
+		}),
 	],
 	devtool: 'source-map',
 };
