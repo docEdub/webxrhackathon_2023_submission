@@ -8,7 +8,7 @@
 import { GlobalComponent } from './global';
 import { PlayerComponent } from './player';
 import { System } from '@lastolivegames/becsy';
-import { VRButton } from 'ratk';
+import { ARButton } from 'ratk';
 // import { Vector3 } from 'three';
 
 // const CAMERA_START_POSITION = new Vector3(0, 4, 34);
@@ -27,8 +27,9 @@ export class InlineSystem extends System {
 		const vrButton = document.getElementById('vr-button');
 		const webLaunchButton = document.getElementById('web-launch-button');
 		webLaunchButton.style.display = 'none';
-		VRButton.convertToVRButton(vrButton, global.renderer, {
+		ARButton.convertToARButton(vrButton, global.renderer, {
 			optionalFeatures: ['local-floor', 'bounded-floor', 'layers'],
+			requiredFeatures: ['hit-test', 'mesh-detection', 'plane-detection'],
 			onUnsupported: () => {
 				vrButton.style.display = 'none';
 				webLaunchButton.style.display = 'block';

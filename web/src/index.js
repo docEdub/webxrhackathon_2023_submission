@@ -11,14 +11,13 @@ import amplifyConfig from './amplifyconfigure';
 
 import { PlayerComponent, PlayerSystem } from './player';
 
-import { FlapSystem } from './flap';
 import { GameSystem } from './game';
 import { GlobalComponent } from './global';
 import { InlineSystem } from './landing';
 import { World } from '@lastolivegames/becsy';
 import { setupScene } from './scene';
 
-Amplify.configure(amplifyConfig); 
+Amplify.configure(amplifyConfig);
 
 const worldDef = {
 	defs: [
@@ -26,7 +25,6 @@ const worldDef = {
 		PlayerComponent,
 		PlayerSystem,
 		InlineSystem,
-		FlapSystem,
 		GameSystem,
 	],
 };

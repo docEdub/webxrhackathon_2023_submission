@@ -4,18 +4,15 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	SRGBColorSpace,
-	/** Comment this out when your local asset changes to S3 asset, workshop three step two */
-	// TextureLoader,
 } from 'three';
 
-import { FlapSystem } from './flap';
 import { GlobalComponent } from './global';
 import { PlayerComponent } from './player';
+import { PlayerSystem } from './player';
 import { System } from '@lastolivegames/becsy';
 import { Text } from 'troika-three-text';
 import { generateUUID } from 'three/src/math/MathUtils';
 import localforage from 'localforage';
-/** Uncomment this line to enable load asset from S3 */
 import { loadAsset } from './fetchurl';
 import { Auth } from 'aws-amplify';
 import amplifyconfig from './amplifyconfigure';
@@ -28,10 +25,6 @@ const RECORD_SCORE_KEY = 'record-score';
 const PLAYER_ID_KEY = 'player-id';
 const API_GATEWAY_URL = amplifyconfig.Api.url;
 
-/** Comment this code block for workshop step two, since this will be replaced by the S3 loading asset */
-// const SCORE_BOARD_TEXTURE = new TextureLoader().load('assets/scoreboard.png');
-// SCORE_BOARD_TEXTURE.colorSpace = SRGBColorSpace;
-
 export class GameSystem extends System {
 
 	constructor() {
@@ -42,7 +35,7 @@ export class GameSystem extends System {
 			(q) => q.current.with(GlobalComponent).write,
 		);
 		this.playerEntity = this.query((q) => q.current.with(PlayerComponent));
-		this.schedule((s) => s.after(FlapSystem));
+		this.schedule((s) => s.after(PlayerSystem));
 
 		this._flapData = {
 			left: {
@@ -90,8 +83,6 @@ export class GameSystem extends System {
 			const session = await Auth.currentSession();
 			this.ID_TOKEN = session.getIdToken().getJwtToken();
 
-			/**
-			 * Uncomment this code block for workshop three step two */
 			this.SCORE_BOARD_TEXTURE = await loadAsset('png', 'assets/scoreboard.png');
 			if (!this.SCORE_BOARD_TEXTURE){
 				console.error("Assets was not loaded correctly");
@@ -99,7 +90,6 @@ export class GameSystem extends System {
 			}
 			console.log("score board" + this.SCORE_BOARD_TEXTURE);
             this.SCORE_BOARD_TEXTURE.colorSpace = SRGBColorSpace;
-			/**/
     }
 
 	execute() {
