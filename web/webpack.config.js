@@ -10,7 +10,8 @@ module.exports = {
 	mode: 'development',
 	entry: {
 		auth: './src/auth.js',
-		main: './src/index.js'
+		main: './src/index.js',
+		audio_test: './src/audio_test.js'
 	},
 	module: {
 		rules: [
@@ -46,9 +47,14 @@ module.exports = {
 			filename: 'main.html',
 			chunks: ['main']
 		}),
-//		new CopyPlugin({
-//			patterns: [{ from: 'src/assets', to: 'assets' }],
-//		}),
+		new HtmlWebpackPlugin({
+            template: './src/audio_test.html',
+			filename: 'audio_test.html',
+			chunks: ['audio_test']
+		}),
+		new CopyPlugin({
+			patterns: [{ from: 'src/assets', to: 'assets' }],
+		}),
 	],
 	devtool: 'source-map',
 };
