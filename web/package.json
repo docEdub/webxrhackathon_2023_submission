@@ -29,7 +29,7 @@
 		"aws-amplify": "^5.3.11",
 		"gamepad-wrapper": "^1.2.0",
 		"localforage": "^1.10.0",
-		"ratk": "^0.2.0",
+		"ratk": "^0.3.0",
 		"three": "^0.149.0",
 		"troika-three-text": "^0.48.0"
 	}
