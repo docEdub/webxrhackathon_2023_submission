@@ -1,6 +1,6 @@
 ## Experience Setup - to be done by "Team B Flats"
 1) Ensure the headset is charged and powered on.
-2) Go to settings > ... > room setup > ...
+2) Go to settings > physical space > space setup > "Set Up"
 3) After setting up, ensure that there are planes encircling the entire room -- no open-ended parts of room
 4) After setting up, ensure that the guardian barrier encompasses the entire room
 5) In the headset, go to browser, enter URL of application. Ensure that the login screen loads. Ensure that the user is logged out, there is no currently logged-in user.
@@ -76,3 +76,12 @@ Enter a username, password, and your email address, and click "Sign Up"
 ![app login prompt](images/app-login.png)
 
 Email verification is disabled, so go ahead and click "Sign In" with your new user account to access the game.
+
+### Architecture notes
+
+- As a user, I set an anchor point for the scene origin at a predetermined physical location in the room.
+- I can place objects and each objects will have a world position relative to that origin.
+- Each object will have a vec3 position (xyz) and vec4 quaternion (xyzw), and perhaps additional info such as objectType
+***
+- As a user coming into a scene that already has elements placed... I set an anchor point.
+- For all objects in the database that are associated with this scene, load each and create the object in the vec3 xyz position and vec4 rotation relative to the anchor point.
