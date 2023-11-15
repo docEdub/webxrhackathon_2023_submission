@@ -2,7 +2,7 @@ import './styles/index.css';
 
 import { Auth, Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
-import fetchPreSignedUrl from './fetchurl';
+import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -361,6 +361,25 @@ export async function fetchAndPlayWebMAudioByUser() {
     }
 }
 
+
+export async function fetchAllAudioFiles() {
+    try {
+        // Common asset key name
+        const assetKey = 'sound.webm';
+
+        // Fetch the pre-signed URLs for the audio files
+        const preSignedUrls = await fetchAllPreSignedUrls(assetKey);
+
+        console.log(preSignedUrls);
+
+        return preSignedUrls;
+
+    } catch (error) {
+        console.error('Failed to fetch audio files:', error);
+    }
+}
+
+
 export async function recordAndUploadWebMAudio() {
     try {
         // Request access to the microphone
@@ -408,4 +427,5 @@ export async function recordAndUploadWebMAudio() {
 (async () => {
     //uncomment to immediately test upload
     //await recordAndUploadWebMAudio();
+    await fetchAllAudioFiles();
 })();

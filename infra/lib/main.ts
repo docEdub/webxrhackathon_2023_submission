@@ -34,10 +34,13 @@ export class Main {
      '../lambdaScripts/getAsset', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
     const putAssetLambda = new LambdaStack(scope, "putAssetLambda", cdk.aws_lambda.Runtime.NODEJS_18_X,
     '../lambdaScripts/putAsset', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
+    const getAllAssetsLambda = new LambdaStack(scope, "getAllAssetsLambda", cdk.aws_lambda.Runtime.NODEJS_18_X,
+    '../lambdaScripts/getAllAssets', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
 
     //Grant Lambda functions read/write access to S3 bucket
     storageBucket.grantRead(getAssetLambda.lambdaFunction);
     storageBucket.grantReadWrite(putAssetLambda.lambdaFunction);
+    storageBucket.grantReadWrite(getAllAssetsLambda.lambdaFunction);
 
     //Build Cognito Stack
     const cognitoStack = new CognitoStack(scope, "auth", true, true);
@@ -48,6 +51,7 @@ export class Main {
 
     apiGateway.AddMethodIntegration(getAssetLambda.MethodIntegration(), "assets", "GET", apiAuthorizer);
     apiGateway.AddMethodIntegration(putAssetLambda.MethodIntegration(), "assets", "PUT", apiAuthorizer);
+    apiGateway.AddMethodIntegration(getAllAssetsLambda.MethodIntegration(), "assets/all", "GET", apiAuthorizer);
 
     //Upload Website
     const website = new WebSiteDeployment(scope, "webDeployment", '../../web/dist', 'index.html', apiGateway, storageBucket);
