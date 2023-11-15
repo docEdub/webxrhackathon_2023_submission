@@ -1,23 +1,6 @@
 {
-  "Storage": {
-      "AWSS3": {
-          "bucket": "mainstack-storagebucket19db2ff8-9ft8bw8w975s"
-      }
-  },
-  "Auth": {
-      "userPoolWebClientId": "18csaa9luikdpa3rpicaef5qd5",
-      "region": "us-west-2",
-      "identityPoolId": "us-west-2:70ee2ecd-eedb-407f-b8f8-d55383b20c31",
-      "userPoolId": "us-west-2_av6bKwseQ",
-      "mandatorySignIn": "true"
-  },
-  "API": {
-      "endpoints": [
-          {
-              "endpoint": "https://olwq3i93lc.execute-api.us-west-2.amazonaws.com/dev/",
-              "name": "gateway_G",
-              "region": "us-west-2"
-          }
-      ]
+  "WorkshopOne": {
+    "gatewayGEndpoint5D1E33B9": "https://t8g7c2op2i.execute-api.us-west-2.amazonaws.com/dev/",
+    "Params": "{\"Storage\":{\"AWSS3\":{\"bucket\":\"workshopone-storagebucket19db2ff8-ljhhkgcuon5a\"}},\"CloudFront\":{\"domainName\":\"d2o5f4a6g17xul.cloudfront.net\"},\"API\":{\"endpoints\":[{\"name\":\"gateway_G\",\"endpoint\":\"https://t8g7c2op2i.execute-api.us-west-2.amazonaws.com/dev/\",\"region\":\"us-west-2\"}]}}"
   }
 }

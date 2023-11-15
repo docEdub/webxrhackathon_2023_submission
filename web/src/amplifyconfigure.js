@@ -1,6 +1,6 @@
 const amplifyConfig = {
    Api: {
-    url: 'REPLACE_WITH_WorkshopOne.APIRestURL_FROM_CDK_OUTPUT'
+    url: 'https://t8g7c2op2i.execute-api.us-west-2.amazonaws.com/dev'
   }
 };
 
