@@ -18,7 +18,9 @@ import {
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
-	DoubleSide
+	DoubleSide,
+	CylinderGeometry,
+	ConeGeometry
 } from 'three';
 import * as Tone from 'tone';
 
@@ -49,6 +51,7 @@ function init() {
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
 	setupScene();
+	setupMenu();
 }
 
 /**
@@ -61,6 +64,53 @@ function setupScene() {
 	// this.hitTestTarget.add(hitTestMarker);
 	scene.add(skySphere)
 }
+
+/**
+ * Creates a "lower third" menu similar to Quest OS toolbar.
+ * The toolbar consists of a thin, semitransparent box (similar to plane)
+ * On the toolbar are 4 different shapes each in a different color - box, sphere, cylinder, cone
+ * The toolbar should always be visible to the user regardless fo their location
+ * Therefore the toolbar "follows" the user camera around, or it could be set as a child of the user camera
+ */
+function setupMenu() {
+    // Create the toolbar as a thin, semitransparent box
+    const toolbarGeometry = new BoxGeometry(1, 0.1, 0.01); // Adjust size as needed
+    const toolbarMaterial = new MeshBasicMaterial({ 
+        color: 0xaaaaaa, // Grey color
+        transparent: true,
+        opacity: 0.5
+    });
+    const toolbar = new Mesh(toolbarGeometry, toolbarMaterial);
+
+    // Add toolbar as a child of the camera so it always follows the user
+    toolbar.position.set(0, 1, 0); // Adjust position relative to camera
+    scene.add(toolbar);
+
+    // Define shapes with their respective geometries and colors
+    const shapes = [
+        { geometry: BoxGeometry, color: 0xff0000 }, // red box
+        { geometry: SphereGeometry, color: 0x00ff00 }, // green sphere
+        { geometry: CylinderGeometry, color: 0x0000ff }, // blue cylinder
+        { geometry: ConeGeometry, color: 0xffff00 } // yellow cone
+    ];
+
+    // Create the shapes and add them to the toolbar
+    shapes.forEach((shape, index) => {
+		let geometry;
+		if (shape == SphereGeometry) {
+			geometry = new shape.geometry(0.1); // Adjust size as needed
+		} else {
+			geometry = new shape.geometry(0.1, 0.1, 0.1); // Adjust size as needed
+		}
+        const material = new MeshBasicMaterial({ color: shape.color });
+        const mesh = new Mesh(geometry, material);
+
+        // Position each shape on the toolbar
+        mesh.position.x = -0.35 + index * 0.2; // This positions shapes with equal spacing
+        toolbar.add(mesh);
+    });
+}
+
 
 /**
  * Sets up the camera for the scene.
