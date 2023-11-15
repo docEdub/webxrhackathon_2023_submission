@@ -1,4 +1,20 @@
-## Setup
+## Experience Setup - to be done by "Team B Flats"
+1) Ensure the headset is charged and powered on.
+2) Go to settings > ... > room setup > ...
+3) After setting up, ensure that there are planes encircling the entire room -- no open-ended parts of room
+4) After setting up, ensure that the guardian barrier encompasses the entire room
+5) In the headset, go to browser, enter URL of application. Ensure that the login screen loads. Ensure that the user is logged out, there is no currently logged-in user.
+6) On a computer, go to browser, enter URL of application. Instruct the User to create a new account, with a suggested username (judge) and password (Testing123!)
+
+## User Experience - to be done by user
+1) On a computer using a real keyboard, open URL of application in browser and create a new account, with a suggested username (judge) and password (Testing123!).
+2) Put on the headset which should have the browser open to the application window.
+3) The user will need to log-in.
+4) Then the user will see the app welcome screen with instructions to press the play button.
+5) Then the user will need to ensure they are standing on the "starting position" and hold down the grip controls for 3 seconds. Doing so will create a new anchor at the orientation and position of the camera (ie the user's perspective)
+6) Then the user will see instructions and an interface for interacting with the scene.
+
+## Dev Setup
 
 Navigate to the `infra/` folder from the project root, and delete the cloud assembly output folder
 
