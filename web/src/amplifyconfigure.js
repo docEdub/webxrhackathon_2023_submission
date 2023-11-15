@@ -1,21 +1,21 @@
 const amplifyConfig = {
   Auth: {
     // REQUIRED - Amazon Cognito Identity Pool ID
-    identityPoolId: 'us-east-1:c7065197-ea63-4956-ac62-1b2ac91bab82',
+    identityPoolId: 'us-east-1:44270c54-a756-463f-b4b9-df6adb668c62',
     
     // REQUIRED - Amazon Cognito Region
     region: 'US-EAST-1',
     
     // REQUIRED- Amazon Cognito User Pool ID
-    userPoolId: 'us-east-1_OU59uADnu',
+    userPoolId: 'us-east-1_kPhNyNGzk',
 
-    userPoolWebClientId: '14fd6lm16lg7sob6v8fihnr2in',
+    userPoolWebClientId: '6ga1jlc01u38u75q69h2e2l2gb',
 
     // OPTIONAL - Enforce user authentication prior to accessing AWS resources or not
     mandatorySignIn: true,
   },
   Api: {
-    url: 'https://dyu2c7pal5.execute-api.us-east-1.amazonaws.com/dev/'
+    url: 'https://1no4pqba24.execute-api.us-east-1.amazonaws.com/dev/'
   }
 };
 
