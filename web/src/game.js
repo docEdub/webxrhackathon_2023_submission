@@ -5,7 +5,7 @@ import {
 	PlaneGeometry,
 	SRGBColorSpace,
 	/** Comment this out when your local asset changes to S3 asset, workshop three step two */
-	TextureLoader,
+	// TextureLoader,
 } from 'three';
 
 import { FlapSystem } from './flap';
@@ -16,7 +16,7 @@ import { Text } from 'troika-three-text';
 import { generateUUID } from 'three/src/math/MathUtils';
 import localforage from 'localforage';
 /** Uncomment this line to enable load asset from S3 */
-// import { loadAsset } from './fetchurl'; 
+import { loadAsset } from './fetchurl';
 import { Auth } from 'aws-amplify';
 import amplifyconfig from './amplifyconfigure';
 
@@ -29,8 +29,8 @@ const PLAYER_ID_KEY = 'player-id';
 const API_GATEWAY_URL = amplifyconfig.Api.url;
 
 /** Comment this code block for workshop step two, since this will be replaced by the S3 loading asset */
-const SCORE_BOARD_TEXTURE = new TextureLoader().load('assets/scoreboard.png');
-SCORE_BOARD_TEXTURE.colorSpace = SRGBColorSpace;
+// const SCORE_BOARD_TEXTURE = new TextureLoader().load('assets/scoreboard.png');
+// SCORE_BOARD_TEXTURE.colorSpace = SRGBColorSpace;
 
 export class GameSystem extends System {
 
@@ -91,15 +91,15 @@ export class GameSystem extends System {
 			this.ID_TOKEN = session.getIdToken().getJwtToken();
 
 			/**
-			 * Uncomment this code block for workshop three step two 
-		    this.SCORE_BOARD_TEXTURE = await loadAsset('exr', 'assets/scoreboard.png');
+			 * Uncomment this code block for workshop three step two */
+			this.SCORE_BOARD_TEXTURE = await loadAsset('png', 'assets/scoreboard.png');
 			if (!this.SCORE_BOARD_TEXTURE){
 				console.error("Assets was not loaded correctly");
 				return;
 			}
 			console.log("score board" + this.SCORE_BOARD_TEXTURE);
             this.SCORE_BOARD_TEXTURE.colorSpace = SRGBColorSpace;
-			 */
+			/**/
     }
 
 	execute() {
@@ -308,4 +308,3 @@ const createText = (defaultValue) => {
 	text.position.z = 0.001;
 	return text;
 };
-

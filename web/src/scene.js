@@ -16,10 +16,10 @@ import {
 } from 'three';
 
 /** Comment this out when you replace local asset with S3 loading asset, workshop three step two*/
-import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 /** Uncomment this import for workshop three step two, */
-// import {loadAsset} from './fetchurl';
+import {loadAsset} from './fetchurl';
 
 export const setupScene = () => {
 	const scene = new Scene();
@@ -47,29 +47,29 @@ export const setupScene = () => {
 	const pmremGenerator = new PMREMGenerator(renderer);
 	pmremGenerator.compileEquirectangularShader();
 
-	new EXRLoader().load('assets/venice_sunset_1k.exr', (texture) => {
-		const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-		pmremGenerator.dispose();
-		scene.environment = envMap;
-	});
-
-	/** Uncomment this to change this asset loading from  local asset to loading from S3
-	 * workshop three step two */
-	// loadAsset('exr', 'assets/venice_sunset_1k.exr', (texture) => {
+	// new EXRLoader().load('assets/venice_sunset_1k.exr', (texture) => {
 	// 	const envMap = pmremGenerator.fromEquirectangular(texture).texture;
 	// 	pmremGenerator.dispose();
 	// 	scene.environment = envMap;
-	// })
+	// });
+
+	/** Uncomment this to change this asset loading from  local asset to loading from S3
+	 * workshop three step two */
+	loadAsset('exr', 'assets/venice_sunset_1k.exr', (texture) => {
+		const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+		pmremGenerator.dispose();
+		scene.environment = envMap;
+	})
 
     /** Uncomment this to change this asset loading from  local asset to loading from S3
 	 * workshop three step two */
-	// loadAsset('gltf','assets/flappybird.glb', (gltf) => {
-	// 	scene.add(gltf.scene);
-	// })
+	loadAsset('gltf','assets/flappybird.glb', (gltf) => {
+		scene.add(gltf.scene);
+	})
 
-	new GLTFLoader().load('assets/flappybird.glb', (gltf) => {
-	scene.add(gltf.scene);
-	});
+	// new GLTFLoader().load('assets/flappybird.glb', (gltf) => {
+	// scene.add(gltf.scene);
+	// });
 
 	window.addEventListener('resize', function () {
 		camera.aspect = window.innerWidth / window.innerHeight;
@@ -80,4 +80,3 @@ export const setupScene = () => {
 
 	return { scene, camera, renderer };
 };
-

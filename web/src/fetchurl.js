@@ -29,8 +29,9 @@ export async function fetchPreSignedUrl(assetKey) {
 
 const MAX_RETRIES = 3;
 
-/** Uncomment these line of code, workshop step 2.1, to create custom load asset function 
+/** Uncomment these line of code, workshop step 2.1, to create custom load asset function
  * that loads asset from S3
+ * */
 export async function loadAsset(assetType, assetKey, processAsset, retryCount = 0) {
     try {
         const preSignedUrl = await fetchPreSignedUrl(assetKey);
@@ -61,5 +62,3 @@ export async function loadAsset(assetType, assetKey, processAsset, retryCount = 
         }
     }
 }
-
-

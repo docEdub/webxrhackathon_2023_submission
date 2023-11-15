@@ -1,12 +1,12 @@
 import { Group, Vector3 } from 'three';
 import { PlayerComponent, PlayerSystem } from './player';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { GlobalComponent } from './global';
 import { System } from '@lastolivegames/becsy';
-/** Uncomment this import 
+/** Uncomment this import */
 import { loadAsset } from './fetchurl';
-*/
+/**/
 const START_ANGULAR_SPEED = Math.PI / 25;
 const GRAVITY = -9.8;
 const FLAP_SPEED_MULTIPLIER = 0.1;
@@ -40,6 +40,7 @@ export class FlapSystem extends System {
 		playerSpace.rotateY(-Math.PI / 2);
 		scene.add(this._rotator);
 		//Comment out this original loader that loads assets from local disk, workshop step 2.3
+		/*
 		new GLTFLoader().load('assets/wing.glb', (gltf) => {
 			const rightWing = gltf.scene;
 			const leftWing = rightWing.clone(true);
@@ -48,7 +49,8 @@ export class FlapSystem extends System {
 			this._wings.left = leftWing;
 			this._wings.right = rightWing;
 		});
-		/** uncomment these lines of code, workshop step 2.3, to use custom load asset function
+		*/
+		/** uncomment these lines of code, workshop step 2.3, to use custom load asset function */
 		loadAsset('gltf', 'assets/wing.glb', (gltf) => {
 			const rightWing = gltf.scene;
 			const leftWing = rightWing.clone(true);
@@ -57,7 +59,7 @@ export class FlapSystem extends System {
 			this._wings.left = leftWing;
 			this._wings.right = rightWing;
 		});
-		*/
+		/**/
 	}
 
 	execute() {

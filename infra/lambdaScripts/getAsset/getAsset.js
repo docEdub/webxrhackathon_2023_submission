@@ -45,9 +45,6 @@ const jsonResponse = (statusCode, body) => {
     };
 };
 
-/** Uncomment these lines of code to follow workshop step 1.3, 
- * and this will help you create a Lambda function that generates a pre-signed S3 URL
-
 export const handler = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
 
@@ -72,4 +69,3 @@ export const handler = async (event) => {
         return jsonResponse(500, { "message": error.toString() });
     }
 };
-*/
