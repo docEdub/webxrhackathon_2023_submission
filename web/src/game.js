@@ -106,7 +106,7 @@ export class GameSystem extends System {
 		const global = this.globalEntity.current[0].write(GlobalComponent);
 		const player = this.playerEntity.current[0].read(PlayerComponent);
 		const isPresenting = global.renderer.xr.isPresenting;
-		console.log("is presenting" + isPresenting);
+		console.debug("is presenting " + isPresenting);
 		const rotator = player.space.parent;
 
 		if (!this._scoreBoard) {
