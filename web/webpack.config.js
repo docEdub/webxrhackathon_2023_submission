@@ -46,9 +46,9 @@ module.exports = {
 			filename: 'main.html',
 			chunks: ['main']
 		}),
-		new CopyPlugin({
-			patterns: [{ from: 'src/assets', to: 'assets' }],
-		}),
+//		new CopyPlugin({
+//			patterns: [{ from: 'src/assets', to: 'assets' }],
+//		}),
 	],
 	devtool: 'source-map',
 };

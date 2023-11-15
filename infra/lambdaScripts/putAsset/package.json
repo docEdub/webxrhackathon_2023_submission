@@ -1,8 +1,8 @@
 {
-  "name": "getplayerinfo",
+  "name": "putasset",
   "version": "1.0.0",
   "description": "",
-  "main": "getPlayerInfo.js",
+  "main": "putAsset.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
