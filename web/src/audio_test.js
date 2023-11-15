@@ -9,6 +9,7 @@ import {
 	MeshBasicMaterial,
 	PerspectiveCamera,
 	Scene,
+	SphereGeometry,
 	WebGLRenderer,
 } from 'three';
 import * as Tone from 'tone';
@@ -16,9 +17,13 @@ import * as Tone from 'tone';
 import { Text } from 'troika-three-text';
 
 // Global variables for scene components
-let camera, scene, renderer;
+let camera, scene, renderer, sphere;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
+
+// Animation variables
+let speed = 0.1;
+let direction = 1;
 
 // Initialize and animate the scene
 init();
@@ -42,11 +47,24 @@ function init() {
  * Creates black sky sphere to block out AR camera
  */
 function setupScene() {
-	// const geometry = new SphereGeometry(150);
-	// const material = new MeshBasicMaterial({color: 0x000000, side: DoubleSide});
-	// const skySphere = new Mesh(geometry, material);
-	// this.hitTestTarget.add(hitTestMarker);
-	// scene.add(skySphere)
+	// Create a sphere
+	const geometry = new SphereGeometry(1, 32, 32);
+	const material = new MeshBasicMaterial({ color: 0xff0000 });
+	sphere = new Mesh(geometry, material);
+	sphere.position.y = 1;
+	sphere.position.z = -4;
+	scene.add(sphere);
+
+	// Camera position
+	camera.position.z = 5;
+}
+
+function animateSphere() {
+	// Update sphere position
+    sphere.position.x += speed * direction;
+    if (sphere.position.x > 10 || sphere.position.x < -10) {
+        direction *= -1; // Change direction
+    }
 }
 
 /**
@@ -178,6 +196,7 @@ function animate() {
  * Render loop for the scene, updating AR functionalities.
  */
 function render() {
+	animateSphere();
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
