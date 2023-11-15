@@ -23,7 +23,7 @@ git stash
 
 Check out the `workshop_two` branch 
 ```
-git checkout workshop_two
+git checkout workshop_three
 ```
 
 Navigate to the `infra/` folder from the project root, and delete the cloud assembly output folder 
