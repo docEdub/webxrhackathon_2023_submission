@@ -5,7 +5,7 @@ import {
 } from "three";
 
 export class AudioEngine {
-    constructor() {
+    constructor(xr) {
         this.audioContext = new AudioContext();
         this.listener = new AudioListener(this);
 
@@ -13,6 +13,7 @@ export class AudioEngine {
         this._rampDuration = 0.25; // seconds
         this._recordingDuration = 10; // seconds
         this._sources = [];
+        this._xr = xr;
 
         document.onclick = () => {
             this.audioContext.resume();
@@ -40,6 +41,10 @@ export class AudioEngine {
 
     getRampTime() {
         return this.audioContext.currentTime + this._rampDuration;
+    }
+
+    update() {
+
     }
 }
 
