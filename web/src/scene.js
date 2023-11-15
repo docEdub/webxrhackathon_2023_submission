@@ -15,10 +15,6 @@ import {
 	sRGBEncoding,
 } from 'three';
 
-/** Comment this out when you replace local asset with S3 loading asset, workshop three step two*/
-// import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-/** Uncomment this import for workshop three step two, */
 import {loadAsset} from './fetchurl';
 
 export const setupScene = () => {
