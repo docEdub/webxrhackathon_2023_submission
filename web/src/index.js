@@ -9,8 +9,10 @@ import {
 	BoxGeometry,
 	BufferGeometry,
 	DirectionalLight,
+	Group,
 	HemisphereLight,
 	Line,
+	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
@@ -30,7 +32,7 @@ import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerM
 Amplify.configure(amplifyConfig);
 
 // Global variables for scene components
-let camera, scene, renderer, controller;
+let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 
@@ -80,12 +82,16 @@ function setupMenu() {
         transparent: true,
         opacity: 0.5
     });
+
+	uiGroup = new Group();
+	scene.add(uiGroup);
+
     const toolbar = new Mesh(toolbarGeometry, toolbarMaterial);
+	uiGroup.add(toolbar);
 
     // Add toolbar as a child of the camera so it always follows the user
-    toolbar.position.set(0, 1, 0); // Adjust position relative to camera
-    scene.add(toolbar);
-
+    toolbar.position.set(0, -1, -2); // Adjust position relative to camera
+	
     // Define shapes with their respective geometries and colors
     const shapes = [
         { geometry: BoxGeometry, color: 0xff0000 }, // red box
@@ -326,12 +332,39 @@ function animate() {
 }
 
 /**
+ * Updates UI to keep it in front of the camera. Call from render loop.
+ */
+function updateUi() {
+	const xrManager = renderer.xr;
+	const session = xrManager.getSession();
+	if (!session) {
+		return;
+	}
+
+	// get camera pose from xrManager
+	const referenceSpace = xrManager.getReferenceSpace();
+	const frame = xrManager.getFrame();
+	const pose = frame.getViewerPose(referenceSpace);
+	if (pose) {
+		const headsetMatrix = new Matrix4().fromArray(
+			pose.views[0].transform.matrix,
+		);
+		headsetMatrix.decompose(
+			uiGroup.position,
+			uiGroup.quaternion,
+			uiGroup.scale,
+		);
+	}
+}
+
+/**
  * Render loop for the scene, updating AR functionalities.
  */
 function render() {
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
+	updateUi();
 	renderer.render(scene, camera);
 }
 
@@ -474,8 +507,8 @@ export async function recordAndUploadWebMAudio() {
     }
 }
 
-(async () => {
-    //uncomment to immediately test upload
-    //await recordAndUploadWebMAudio();
-    await fetchAllAudioFiles();
-})();
+// (async () => {
+//     //uncomment to immediately test upload
+//     //await recordAndUploadWebMAudio();
+//     await fetchAllAudioFiles();
+// })();
