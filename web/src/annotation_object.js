@@ -15,6 +15,7 @@ export class AnnotationObject {
         group.position.copy(position);
         group.quaternion.copy(quaternion);
         anchor.add(group);
+        group.position.sub(anchor.position);
 
         const geometry = new SphereGeometry(0.5);
         const material = new MeshBasicMaterial({color: 0x222222, side: DoubleSide});

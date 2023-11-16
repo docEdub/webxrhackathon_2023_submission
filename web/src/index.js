@@ -286,12 +286,12 @@ function handleSelectStart(e) {
 /**
  * Handles 'squeezestart' event for the controller.
  */
-function handleSqueezeStart() {
+async function handleSqueezeStart() {
 	// delete old anchors
-	ratk.anchors.forEach((anchor) => {
-		console.log(anchor.anchorID);
-		ratk.deleteAnchor(anchor);
-	});
+	for(let anchor of ratk.persistentAnchors) {
+		console.log("deleting persistent anchor: ", anchor.anchorID)
+		await ratk.deleteAnchor(anchor);
+	};
 
 	// Clone the camera position and set y-coordinate to 0
 	const positionClone = camera.position.clone();
@@ -313,12 +313,18 @@ function setupRATK() {
 	scene.add(ratk.root);
 	renderer.xr.addEventListener('sessionstart', () => {
 		setTimeout(() => {
-			ratk.restorePersistentAnchors().then(() => {
-				console.log("restored persistent anchors: ", ratk.anchors)
-				ratk.anchors.forEach((anchor) => {
-					setPrimaryAnchor(anchor, true);
+			try {
+				ratk.restorePersistentAnchors().then(() => {
+					console.log("restored persistent anchors: ", ratk.anchors)
+					ratk.anchors.forEach((anchor) => {
+						setPrimaryAnchor(anchor, true);
+					});
 				});
-			});
+			}
+			catch (error) {
+				console.error("error restoring anchors: ", error.message);
+				throw error;
+			}
 		}, 1000);
 		// setTimeout(() => {
 		// 	if (ratk.planes.size == 0) {
@@ -434,6 +440,7 @@ function handlePendingAnchors() {
 }
 
 function setPrimaryAnchor(anchor, isRecovered) {
+
 	if (primaryAnchor) {
 		scene.remove(primaryAnchor);
 		scene.remove(primaryAnchorMesh);
@@ -443,7 +450,7 @@ function setPrimaryAnchor(anchor, isRecovered) {
 	console.log("primary anchor: ", primaryAnchor);
 
 	buildAnchorMarker(anchor, isRecovered);
-	// loadAnnotationObjects(scene, anchor);
+	loadAnnotationObjects(scene, anchor);
 
 }
 
