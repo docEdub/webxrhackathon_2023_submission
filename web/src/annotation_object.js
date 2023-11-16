@@ -8,11 +8,12 @@ import {
 
 export class AnnotationObject {
     constructor(scene, anchor, position, quaternion) {
-        const geometry = new SphereGeometry(0.1);
+        const geometry = new SphereGeometry(0.5);
         const material = new MeshBasicMaterial({color: 0x222222, side: DoubleSide});
         const sphere = new Mesh(geometry, material);
         sphere.position.copy(position);
         sphere.quaternion.copy(quaternion);
+        sphere.scale.y = 0.001;
         anchor.add(sphere)
 
         this._anchor = anchor;
