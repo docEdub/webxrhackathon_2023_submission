@@ -1,8 +1,8 @@
 import './styles/index.css';
 
-import { Auth, Amplify } from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
-import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
+import { testAudio, testAnnotations } from './cloud';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -333,99 +333,11 @@ function updateSemanticLabels() {
 	});
 }
 
-export async function fetchAndPlayWebMAudioByUser() {
-    try {
-        // Get the current user's username
-        const user = await Auth.currentAuthenticatedUser();
-        const username = user.username;
-
-        // Construct the asset key using the username and file name
-        const assetKey = `${username}/sound.webm`;
-
-        // Fetch the pre-signed URL for the audio file
-        const preSignedUrl = await fetchPreSignedUrl(assetKey, 'GET');
-
-        // Create an audio element and set its source to the pre-signed URL
-        const audio = new Audio(preSignedUrl);
-        audio.load();
-
-        // Play the audio file
-        audio.play().then(() => {
-            console.log('Playing audio');
-        }).catch(error => {
-            console.error('Error playing audio:', error);
-        });
-
-    } catch (error) {
-        console.error('Failed to fetch and play audio:', error);
-    }
-}
-
-
-export async function fetchAllAudioFiles() {
-    try {
-        // Common asset key name
-        const assetKey = 'sound.webm';
-
-        // Fetch the pre-signed URLs for the audio files
-        const preSignedUrls = await fetchAllPreSignedUrls(assetKey);
-
-        console.log(preSignedUrls);
-
-        return preSignedUrls;
-
-    } catch (error) {
-        console.error('Failed to fetch audio files:', error);
-    }
-}
-
-
-export async function recordAndUploadWebMAudio() {
-    try {
-        // Request access to the microphone
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        let audioChunks = [];
-
-        mediaRecorder.addEventListener('dataavailable', event => {
-            audioChunks.push(event.data);
-        });
-
-        mediaRecorder.addEventListener('stop', async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const assetKey = 'sound.webm';
-            const preSignedUrl = await fetchPreSignedUrl(assetKey, 'PUT');
-
-            // Upload the audio file to S3
-            const uploadResponse = await fetch(preSignedUrl, {
-                method: 'PUT',
-                body: audioBlob,
-            });
-
-            if (uploadResponse.ok) {
-                console.log('Audio uploaded successfully');
-                //uncomment to immediately test retrieval
-                //await fetchAndPlayWebMAudioByUser();
-            } else {
-                console.error('Audio upload failed');
-            }
-        });
-
-        // Start recording
-        mediaRecorder.start();
-
-        // Stop recording after a desired duration
-        setTimeout(() => {
-            mediaRecorder.stop();
-        }, 5000);  // Adjust this duration as needed
-
-    } catch (error) {
-        console.error('Recording failed:', error);
-    }
-}
-
-(async () => {
-    //uncomment to immediately test upload
-    //await recordAndUploadWebMAudio();
-    await fetchAllAudioFiles();
-})();
+/**
+ Test Audio and Annotation in Cloud
+ **/
+ (async () => {
+     await testAudio();
+     await testAnnotations();
+ })();
+//iife
