@@ -1,9 +1,8 @@
 import './styles/index.css';
 
-import { Auth, Amplify } from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
-// import { testAnnotations } from './cloud';
-import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
+import { fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
 import { startPlacingAnnotationObject } from './annotation_object_placement';
 
@@ -426,35 +425,6 @@ function updateSemanticLabels() {
 		}
 	});
 }
-
-export async function fetchAndPlayWebMAudioByUser() {
-    try {
-        // Get the current user's username
-        const user = await Auth.currentAuthenticatedUser();
-        const username = user.username;
-
-        // Construct the asset key using the username and file name
-        const assetKey = `${username}/sound.webm`;
-
-        // Fetch the pre-signed URL for the audio file
-        const preSignedUrl = await fetchPreSignedUrl(assetKey, 'GET');
-
-        // Create an audio element and set its source to the pre-signed URL
-        const audio = new Audio(preSignedUrl);
-        audio.load();
-
-        // Play the audio file
-        audio.play().then(() => {
-            console.log('Playing audio');
-        }).catch(error => {
-            console.error('Error playing audio:', error);
-        });
-
-    } catch (error) {
-        console.error('Failed to fetch and play audio:', error);
-    }
-}
-
 
 export async function fetchAllAudioFiles() {
     try {
