@@ -19,14 +19,13 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
+	Quaternion,
 	Raycaster,
 	Scene,
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
-	// DoubleSide,
 	CylinderGeometry,
-	// ConeGeometry
 } from 'three';
 
 import { Text } from 'troika-three-text';
@@ -40,6 +39,7 @@ let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
+let primaryAnchorMesh = null;
 
 const raycaster = new Raycaster();
 const raycasterForwardVector = new Vector3(0, 0, -1);
@@ -299,7 +299,7 @@ function handleSqueezeStart() {
 
 	pendingAnchorData = {
 		position: positionClone,
-		quaternion: camera.quaternion.clone(),
+		quaternion: new Quaternion(),
 	};
 }
 
@@ -316,9 +316,7 @@ function setupRATK() {
 			ratk.restorePersistentAnchors().then(() => {
 				console.log("restored persistent anchors: ", ratk.anchors)
 				ratk.anchors.forEach((anchor) => {
-					primaryAnchor = anchor;
-					buildAnchorMarker(anchor, true);
-					loadAnnotationObjects(scene, primaryAnchor);
+					setPrimaryAnchor(anchor, true);
 				});
 			});
 		}, 1000);
@@ -429,14 +427,24 @@ function handlePendingAnchors() {
 				true,
 			)
 			.then((anchor) => {
-				primaryAnchor = anchor;
-				console.log("primary anchor: ", primaryAnchor);
-
-				buildAnchorMarker(anchor, false);
-				loadAnnotationObjects(scene, primaryAnchor);
+				setPrimaryAnchor(anchor, false);
 			});
 		pendingAnchorData = null;
 	}
+}
+
+function setPrimaryAnchor(anchor, isRecovered) {
+	if (primaryAnchor) {
+		scene.remove(primaryAnchor);
+		scene.remove(primaryAnchorMesh);
+	}
+
+	primaryAnchor = anchor;
+	console.log("primary anchor: ", primaryAnchor);
+
+	buildAnchorMarker(anchor, isRecovered);
+	// loadAnnotationObjects(scene, anchor);
+
 }
 
 function buildAnchorMarker(anchor, isRecovered) {
@@ -444,8 +452,8 @@ function buildAnchorMarker(anchor, isRecovered) {
 	const material = new MeshBasicMaterial({
 		color: isRecovered ? 0xff0000 : 0x00ff00,
 	});
-	const cube = new Mesh(geometry, material);
-	anchor.add(cube);
+	primaryAnchorMesh = new Mesh(geometry, material);
+	anchor.add(primaryAnchorMesh);
 	scene.add(anchor);
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
