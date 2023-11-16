@@ -22,9 +22,9 @@ export const removeUserTextRecord = async (username) => {
 }
 
 export const getUserText = async (username) => {
-    if (userTextRecords.length === 0) {
+    // if (userTextRecords.length === 0) {
         await updateUserTextRecords();
-    }
+    // }
 
     const record = userTextRecords.find(record => record.username === username);
     if (!record) {

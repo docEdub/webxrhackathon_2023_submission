@@ -266,13 +266,15 @@ async function handleSelectStart(e) {
 				const annotationObject = hit.object.annotationObject;
 				if (annotationObject.state === "complete") {
 					annotationObject.setState("playing");
+
+					const text = await getUserText(annotationObject.username);
+					updateTextUi(annotationObject.username, text);
 				}
 				else if (annotationObject.state === "playing") {
 					annotationObject.setState("complete");
-				}
 
-				const text = await getUserText(annotationObject.username);
-				updateTextUi(annotationObject.username, text);
+					clearTextUi();
+				}
 
 				return;
 			}
@@ -409,9 +411,8 @@ function updateUi() {
 }
 
 const clearTextUi = () => {
-	for (const child of uiToolbar.children) {
-		uiToolbar.remove(child);
-		child.dispose();
+	while (uiToolbar.children.length > 0) {
+		uiToolbar.remove(uiToolbar.children[0]);
 	}
 }
 
@@ -420,7 +421,16 @@ const updateTextUi = (username, text) => {
 
 	clearTextUi();
 
-	// const usernameMesh = new Text();
+	const usernameMesh = new Text();
+	uiToolbar.add(usernameMesh);
+	usernameMesh.text = username + " says:";
+	usernameMesh.anchorX = 'center';
+	usernameMesh.anchorY = 'bottom';
+	usernameMesh.fontSize = 0.1;
+	usernameMesh.color = 0x002200;
+	usernameMesh.position.y = 0.12;
+	usernameMesh.position.z = 0.2;
+	usernameMesh.sync();
 
 	const textMesh = new Text();
 	uiToolbar.add(textMesh);
@@ -429,6 +439,7 @@ const updateTextUi = (username, text) => {
 	textMesh.anchorY = 'bottom';
 	textMesh.fontSize = 0.1;
 	textMesh.color = 0x000000;
+	textMesh.position.z = 0.2;
 	textMesh.sync();
 }
 
