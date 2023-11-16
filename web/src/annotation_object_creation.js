@@ -33,6 +33,11 @@ export const startCreatingAnnotationObject = async (scene, anchor, hitTestTarget
         annotationObject.dispose();
     }
 
+    if (!hitTestTarget) {
+        console.log("No hit test target, returning");
+        return;
+    }
+
     console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion);
     annotationObject = new AnnotationObject(scene, primaryAnchor, hitTestTarget.position, hitTestTarget.quaternion);
     annotationObject.setState("placed");
