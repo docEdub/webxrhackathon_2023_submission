@@ -21,6 +21,11 @@ export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTest
     }
 
     if (annotationObject) {
+        if (annotationObject.state != "error") {
+            console.log("Already creating annotation");
+            return;
+        }
+
         console.log("Removing existing annotation object");
         annotationObject.dispose();
     }
@@ -66,6 +71,7 @@ const hideRecordingPrompt = () => {
 
 const recordAnnotationSound = async () => {
     if (recordingAttempt >= MAX_RECORDING_ATTEMPTS) {
+        annotationObject.setState("error");
         return;
     }
     recordingAttempt++;

@@ -28,6 +28,8 @@ export class AnnotationObject {
     }
 
     setState(state) {
+        this.state = state;
+
         if (state == "placed") {
             this._material.color.setHex(0xffff00);
         }
@@ -39,6 +41,9 @@ export class AnnotationObject {
         }
         else if (state == "complete") {
             this._material.color.setHex(0x00ff00);
+        }
+        else if (state == "error") {
+            this._material.color.setHex(0xff00ff);
         }
     }
 }
