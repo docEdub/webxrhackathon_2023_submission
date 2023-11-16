@@ -15,7 +15,7 @@ body {
 h1 {
     text-align: center;
     width: 100%; /* Ensures full width for center alignment */
-    color: rgb(162, 0, 255);
+    color: #A00EF9;
     font-size: 90px;
     margin-bottom: 0; /* Reduce bottom margin of h1 */
 }
@@ -23,7 +23,7 @@ h1 {
 h2 {
     text-align: center;
     width: 100%; /* Ensures full width for center alignment */
-    color: rgb(162, 0, 255);
+    color: #A00EF9;
     font-size: 40px;
 }
 
@@ -52,7 +52,7 @@ button {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    background-color: rgb(162, 0, 255);
+    background-color: #A00EF9;
     color: #fff;
     border: none;
     border-radius: 4px;
