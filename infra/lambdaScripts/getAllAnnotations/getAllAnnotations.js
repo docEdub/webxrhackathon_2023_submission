@@ -19,6 +19,7 @@ export const getAllAnnotations = async () => {
         console.log(response);
         annotations = annotations.concat(response.Items.map(item => {
             return {
+                username: item.username.S,
                 position: parseVector3(item.position.S),
                 orientation: parseVector4(item.orientation.S),
                 type: item.annotationType.S
