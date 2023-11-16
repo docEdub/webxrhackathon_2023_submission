@@ -13,7 +13,7 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1, shrink-to-fit=no"
 		/>
-		<title>RATK Demo</title>
+		<title>See Through Sound - Enter XR</title>
 		<style>
 			body {
 				font-family: Arial, sans-serif;
@@ -38,40 +38,11 @@
 	<body style="margin: 0">
 		<div id="scene-container" style="display: block"></div>
 		<div style="position: fixed; top: 10px; left: 10px">
-			<h1>Reality Accelerator Toolkit Demo</h1>
+			<h1>Press the button to start your XR experience</h1>
 
-			<ul>
-				<li>
-					<strong>Visualizing Tracked Planes and Meshes:</strong>
-					Displays wireframe outlines of real-world planes and meshes.
-				</li>
-
-				<li>
-					<strong>Interactive Hit-Testing:</strong>
-					Allows users to conduct hit tests against physical space.
-				</li>
-
-				<li>
-					<strong>Persistent Anchors Creation:</strong>
-					Enables users to create persistent markers in the MR space, shown as
-					green blocks.
-				</li>
-
-				<li>
-					<strong>Recovering Previous Session Anchors:</strong>
-					Recovers and displays markers from previous sessions, shown as red
-					blocks.
-				</li>
-			</ul>
-
-			<p>
-				<strong>How to use:</strong> Press trigger to generate marker at target,
-				press grip to erase all saved markers
-			</p>
-
-			<button id="ar-button"></button>
+			<button id="ar-button">Start</button>
 			<button id="web-launch-button" style="display: none">
-				OPEN ON META QUEST
+				XR Not Detected, Click to Send to Quest
 			</button>
 		</div>
 	</body>

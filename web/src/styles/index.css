@@ -5,6 +5,28 @@
   LICENSE file in the root directory of this source tree.
 */
 
+h1 {
+    text-align: center;
+    width: 100%; /* Ensures full width for center alignment */
+    color: #A00EF9;
+    font-size: 60px;
+    margin-bottom: 0; /* Reduce bottom margin of h1 */
+}
+
+#ar-button {
+    width: 300px; /* Large width */
+    height: 300px; /* Large height to make it a circle */
+    border-radius: 50%; /* Makes it circular */
+    font-size: 55px; /* Larger font size */
+    text-align: center; /* Center the text inside the button */
+    line-height: 300px; /* Vertically center the text inside the button */
+    margin: auto; /* For horizontal centering */
+    display: block; /* To enable margin auto for centering */
+    transform: translateY(50%); /* Adjust for exact centering */
+    color: #ffffff;
+    background-color: #A00EF9;
+}
+
 #ui-panel {
 	position: fixed;
 	bottom: 0;
