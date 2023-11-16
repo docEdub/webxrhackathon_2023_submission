@@ -1,10 +1,11 @@
 import './styles/index.css';
 
-import { Auth, Amplify } from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
-import { testAudio, testAnnotations } from './cloud';
-import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
+import { fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
+import { startCreatingAnnotationObject } from './annotation_object_creation';
+import { loadAnnotationObjects } from './load_annotation_objects';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -22,11 +23,10 @@ import {
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
-	DoubleSide,
+	// DoubleSide,
 	CylinderGeometry,
-	ConeGeometry
+	// ConeGeometry
 } from 'three';
-import * as Tone from 'tone';
 
 import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
@@ -35,7 +35,7 @@ Amplify.configure(amplifyConfig);
 
 // Global variables for scene components
 
-let camera, audioEngine, scene, renderer, controller, uiGroup;
+let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
@@ -54,7 +54,8 @@ function init() {
 	setupLighting();
 	setupRenderer();
 	setupARButton();
-	setupController();
+	setupController(0);
+	setupController(1);
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
 	setupScene();
@@ -65,11 +66,11 @@ function init() {
  * Creates black sky sphere to block out AR camera
  */
 function setupScene() {
-	const geometry = new SphereGeometry(150);
-	const material = new MeshBasicMaterial({color: 0x000000, side: DoubleSide});
-	const skySphere = new Mesh(geometry, material);
+	// const geometry = new SphereGeometry(150);
+	// const material = new MeshBasicMaterial({color: 0x000000, side: DoubleSide});
+	// const skySphere = new Mesh(geometry, material);
+	// scene.add(skySphere)
 	// this.hitTestTarget.add(hitTestMarker);
-	scene.add(skySphere)
 }
 
 /**
@@ -82,7 +83,7 @@ function setupScene() {
 function setupMenu() {
     // Create the toolbar as a thin, semitransparent box
     const toolbarGeometry = new BoxGeometry(1, 0.1, 0.01); // Adjust size as needed
-    const toolbarMaterial = new MeshBasicMaterial({ 
+    const toolbarMaterial = new MeshBasicMaterial({
         color: 0xaaaaaa, // Grey color
         transparent: true,
         opacity: 0.5
@@ -96,19 +97,19 @@ function setupMenu() {
 
     // Add toolbar as a child of the camera so it always follows the user
     toolbar.position.set(0, -1, -2); // Adjust position relative to camera
-	
+
     // Define shapes with their respective geometries and colors
     const shapes = [
         { geometry: BoxGeometry, color: 0xff0000 }, // red box
         { geometry: SphereGeometry, color: 0x00ff00 }, // green sphere
         { geometry: CylinderGeometry, color: 0x0000ff }, // blue cylinder
-        { geometry: ConeGeometry, color: 0xffff00 } // yellow cone
+        // { geometry: ConeGeometry, color: 0xffff00 } // yellow cone
     ];
 
     // Create the shapes and add them to the toolbar
     shapes.forEach((shape, index) => {
 		let geometry;
-		if (shape == SphereGeometry) {
+		if (shape.geometry == SphereGeometry) {
 			geometry = new shape.geometry(0.1); // Adjust size as needed
 		} else {
 			geometry = new shape.geometry(0.1, 0.1, 0.1); // Adjust size as needed
@@ -126,7 +127,7 @@ function setupMenu() {
  * Sets up the audio engine. Must be done after the camera is setup.
  */
 function setupAudioEngine() {
-	audioEngine = new AudioEngine(camera);
+	window.audioEngine = new AudioEngine(camera);
 }
 
 /**
@@ -198,8 +199,8 @@ function setupARButton() {
 /**
  * Sets up the XR controller and its event listeners.
  */
-function setupController() {
-	controller = renderer.xr.getController(0);
+function setupController(controllerIndex) {
+	controller = renderer.xr.getController(controllerIndex);
 	controller.addEventListener('connected', handleControllerConnected);
 	controller.addEventListener('disconnected', handleControllerDisconnected);
 	controller.addEventListener('selectstart', handleSelectStart);
@@ -218,7 +219,7 @@ function setupController() {
 		new Vector3(0, 0, -1),
 	]);
 	const line = new Line(geometry);
-	renderer.xr.getController(0).add(line);
+	renderer.xr.getController(controllerIndex).add(line);
 }
 
 /**
@@ -251,15 +252,7 @@ function handleControllerDisconnected() {
  * Handles 'selectstart' event for the controller.
  */
 function handleSelectStart() {
-	// if (this.hitTestTarget) {
-	// 	pendingAnchorData = {
-	// 		position: this.hitTestTarget.position.clone(),
-	// 		quaternion: this.hitTestTarget.quaternion.clone(),
-	// 	};
-	// 	// // call a new function
-	// 	// // place box under primary anchor
-	// 	// TODO: createChildBox(anchor, hitTestTarget)
-	// }
+	startCreatingAnnotationObject(scene, primaryAnchor, this.hitTestTarget);
 }
 
 /**
@@ -275,7 +268,7 @@ function handleSqueezeStart() {
 	// Clone the camera position and set y-coordinate to 0
 	const positionClone = camera.position.clone();
 	positionClone.y = 0;
-	
+
 	pendingAnchorData = {
 		position: positionClone,
 		quaternion: camera.quaternion.clone(),
@@ -293,16 +286,19 @@ function setupRATK() {
 	renderer.xr.addEventListener('sessionstart', () => {
 		setTimeout(() => {
 			ratk.restorePersistentAnchors().then(() => {
+				console.log("restored persistent anchors: ", ratk.anchors)
 				ratk.anchors.forEach((anchor) => {
+					primaryAnchor = anchor;
 					buildAnchorMarker(anchor, true);
+					loadAnnotationObjects(primaryAnchor);
 				});
 			});
 		}, 1000);
-		setTimeout(() => {
-			if (ratk.planes.size == 0) {
-				renderer.xr.getSession().initiateRoomCapture();
-			}
-		}, 5000);
+		// setTimeout(() => {
+		// 	if (ratk.planes.size == 0) {
+		// 		renderer.xr.getSession().initiateRoomCapture();
+		// 	}
+		// }, 5000);
 	});
 }
 
@@ -404,8 +400,11 @@ function handlePendingAnchors() {
 				true,
 			)
 			.then((anchor) => {
-				buildAnchorMarker(anchor, false);
 				primaryAnchor = anchor;
+				console.log("primary anchor: ", primaryAnchor);
+
+				buildAnchorMarker(anchor, false);
+				loadAnnotationObjects(primaryAnchor);
 			});
 		pendingAnchorData = null;
 	}
@@ -421,12 +420,6 @@ function buildAnchorMarker(anchor, isRecovered) {
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
 	);
-	const synth = new Tone.Synth().toDestination();
-	// const now = Tone.now()
-	const notes = ["C4", "E4", "G4"];
-	const randomIndex = Math.floor(Math.random() * notes.length);
-	const randomNote = notes[randomIndex];
-	synth.triggerAttack(randomNote, "8n")
 }
 
 /**
@@ -440,35 +433,6 @@ function updateSemanticLabels() {
 		}
 	});
 }
-
-export async function fetchAndPlayWebMAudioByUser() {
-    try {
-        // Get the current user's username
-        const user = await Auth.currentAuthenticatedUser();
-        const username = user.username;
-
-        // Construct the asset key using the username and file name
-        const assetKey = `${username}/sound.webm`;
-
-        // Fetch the pre-signed URL for the audio file
-        const preSignedUrl = await fetchPreSignedUrl(assetKey, 'GET');
-
-        // Create an audio element and set its source to the pre-signed URL
-        const audio = new Audio(preSignedUrl);
-        audio.load();
-
-        // Play the audio file
-        audio.play().then(() => {
-            console.log('Playing audio');
-        }).catch(error => {
-            console.error('Error playing audio:', error);
-        });
-
-    } catch (error) {
-        console.error('Failed to fetch and play audio:', error);
-    }
-}
-
 
 export async function fetchAllAudioFiles() {
     try {
@@ -486,82 +450,3 @@ export async function fetchAllAudioFiles() {
         console.error('Failed to fetch audio files:', error);
     }
 }
-
-
-export async function recordAndUploadWebMAudio() {
-    try {
-        // Request access to the microphone
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        let audioChunks = [];
-
-        mediaRecorder.addEventListener('dataavailable', event => {
-            audioChunks.push(event.data);
-        });
-
-        mediaRecorder.addEventListener('stop', async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const assetKey = 'sound.webm';
-            const preSignedUrl = await fetchPreSignedUrl(assetKey, 'PUT');
-
-            // Upload the audio file to S3
-            const uploadResponse = await fetch(preSignedUrl, {
-                method: 'PUT',
-                body: audioBlob,
-            });
-
-            if (uploadResponse.ok) {
-                console.log('Audio uploaded successfully');
-                //uncomment to immediately test retrieval
-                //await fetchAndPlayWebMAudioByUser();
-            } else {
-                console.error('Audio upload failed');
-            }
-        });
-
-        // Start recording
-        mediaRecorder.start();
-
-        // Stop recording after a desired duration
-        setTimeout(() => {
-            mediaRecorder.stop();
-        }, 5000);  // Adjust this duration as needed
-
-    } catch (error) {
-        console.error('Recording failed:', error);
-    }
-}
-
-(async () => {
-    //uncomment to immediately test upload
-    //await recordAndUploadWebMAudio();
-
-    const audioUrls = await fetchAllAudioFiles();
-	for (let audioUrl of audioUrls) {
-		const audioSource = audioEngine.createSource();
-
-		console.log("Fetching audio from " + audioUrl);
-		const response = await fetch(audioUrl);
-		if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		}
-
-		const blob = await response.blob();
-		if (blob.type !== "audio/webm") {
-			throw new Error("Fetched file is not a WebM video. Type is " + blob.type + ".");
-		}
-
-		await audioSource.load(blob);
-
-		// Play back the audio looped forever with a 3 second break between loops.
-		// audioSource.play();
-	}
-})();
-
-/**
- Test Audio and Annotation in Cloud
- **/
- (async () => {
-     //await testAudio();
-     await testAnnotations();
- })();
