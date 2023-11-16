@@ -22,7 +22,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
-	// Quaternion,
+	Quaternion,
 	Raycaster,
 	Scene,
 	SphereGeometry,
@@ -298,8 +298,7 @@ async function handleSqueezeStart() {
 
 	pendingAnchorData = {
 		position: positionClone,
-		// quaternion: new Quaternion(),
-		quaternion: camera.quaternion.clone(),
+		quaternion: new Quaternion(),
 	};
 }
 
