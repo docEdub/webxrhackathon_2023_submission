@@ -7,14 +7,15 @@ import {
 } from 'three';
 
 export class AnnotationObject {
-    constructor(scene, position, quaternion) {
+    constructor(scene, anchor, position, quaternion) {
         const geometry = new SphereGeometry(0.1);
         const material = new MeshBasicMaterial({color: 0x222222, side: DoubleSide});
         const sphere = new Mesh(geometry, material);
         sphere.position.copy(position);
         sphere.quaternion.copy(quaternion);
-        scene.add(sphere)
+        anchor.add(sphere)
 
+        this._anchor = anchor;
         this._geometry = geometry;
         this._material = material;
         this._scene = scene;
@@ -24,7 +25,7 @@ export class AnnotationObject {
     dispose() {
         this._geometry.dispose();
         this._material.dispose();
-        this._scene.remove(this._sphere);
+        this._anchor.remove(this._sphere);
     }
 
     setState(state) {

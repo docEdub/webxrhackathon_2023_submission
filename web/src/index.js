@@ -290,7 +290,7 @@ function setupRATK() {
 				ratk.anchors.forEach((anchor) => {
 					primaryAnchor = anchor;
 					buildAnchorMarker(anchor, true);
-					loadAnnotationObjects(primaryAnchor);
+					loadAnnotationObjects(scene, primaryAnchor);
 				});
 			});
 		}, 1000);
@@ -404,7 +404,7 @@ function handlePendingAnchors() {
 				console.log("primary anchor: ", primaryAnchor);
 
 				buildAnchorMarker(anchor, false);
-				loadAnnotationObjects(primaryAnchor);
+				loadAnnotationObjects(scene, primaryAnchor);
 			});
 		pendingAnchorData = null;
 	}
@@ -417,6 +417,7 @@ function buildAnchorMarker(anchor, isRecovered) {
 	});
 	const cube = new Mesh(geometry, material);
 	anchor.add(cube);
+	scene.add(anchor);
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
 	);
