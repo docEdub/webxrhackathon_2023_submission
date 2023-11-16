@@ -38,7 +38,7 @@ Amplify.configure(amplifyConfig);
 
 // Global variables for scene components
 
-let camera, scene, renderer, controller, uiGroup;
+let camera, scene, renderer, controller, uiGroup, uiToolbar;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
@@ -95,17 +95,17 @@ function setupMenu() {
     const toolbarMaterial = new MeshBasicMaterial({
         color: 0xaaaaaa, // Grey color
         transparent: true,
-        opacity: 0.5
+        opacity: 0
     });
 
 	uiGroup = new Group();
 	scene.add(uiGroup);
 
-    const toolbar = new Mesh(toolbarGeometry, toolbarMaterial);
-	uiGroup.add(toolbar);
+    uiToolbar = new Mesh(toolbarGeometry, toolbarMaterial);
+	uiGroup.add(uiToolbar);
 
     // Add toolbar as a child of the camera so it always follows the user
-    toolbar.position.set(0, -1, -2); // Adjust position relative to camera
+    uiToolbar.position.set(0, -1, -2); // Adjust position relative to camera
 }
 
 /**
@@ -237,7 +237,7 @@ function handleControllerDisconnected() {
 /**
  * Handles 'selectstart' event for the controller.
  */
-function handleSelectStart(e) {
+async function handleSelectStart(e) {
 
 	// controller.updateMatrixWorld();
 
@@ -271,7 +271,7 @@ function handleSelectStart(e) {
 					annotationObject.setState("complete");
 				}
 
-				const text = getUserText(annotationObject.username);
+				const text = await getUserText(annotationObject.username);
 				updateTextUi(annotationObject.username, text);
 
 				return;
@@ -409,8 +409,28 @@ function updateUi() {
 	}
 }
 
-const updateTextUi = (username, text) => {
+const clearTextUi = () => {
+	for (const child of uiToolbar.children) {
+		uiToolbar.remove(child);
+		child.dispose();
+	}
+}
 
+const updateTextUi = (username, text) => {
+	console.log("updateTextUi: username = ", username, ", text = ", text);
+
+	clearTextUi();
+
+	// const usernameMesh = new Text();
+
+	const textMesh = new Text();
+	uiToolbar.add(textMesh);
+	textMesh.text = text;
+	textMesh.anchorX = 'center';
+	textMesh.anchorY = 'bottom';
+	textMesh.fontSize = 0.1;
+	textMesh.color = 0x000000;
+	textMesh.sync();
 }
 
 /**

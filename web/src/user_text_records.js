@@ -1,11 +1,11 @@
 
 import { fetchAllTextFiles } from "./cloud";
 
-const userTextRecords = [];
+let userTextRecords = [];
 
 export const updateUserTextRecords = async () => {
-    const textRecords = await fetchAllTextFiles();
-    console.log(textRecords);
+    userTextRecords = await fetchAllTextFiles();
+    console.log(userTextRecords);
 }
 
 export const removeUserTextRecord = async (username) => {
