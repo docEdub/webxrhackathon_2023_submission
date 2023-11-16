@@ -17,7 +17,7 @@ import {
 	// Group,
 	HemisphereLight,
 	Line,
-	// Matrix4,
+	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
@@ -44,7 +44,9 @@ let primaryAnchor = null;
 let primaryAnchorMesh = null;
 
 const raycaster = new Raycaster();
-const raycasterForwardVector = new Vector3(0, 0, -1);
+// const raycasterForwardVector = new Vector3(0, 0, -1);
+
+const tempMatrix = new Matrix4();
 
 // Initialize and animate the scene
 init();
@@ -259,12 +261,25 @@ function handleControllerDisconnected() {
  * Handles 'selectstart' event for the controller.
  */
 function handleSelectStart(e) {
-	const controller = renderer.xr.getController(e.data.handedness == 'left' ? 1 : 0);
+
+	// controller.updateMatrixWorld();
+
+	// tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+	// raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+	// raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+
+	// return raycaster.intersectObjects( group.children, false );
+
+	const controller = renderer.xr.getController(e.data.handedness == 'left' ? 0 : 1);
 	console.log("controller: ", controller);
 
 	if (primaryAnchor) {
-		raycasterForwardVector.set(0, 0, -1).applyQuaternion(controller.quaternion);
-		raycaster.set(controller.position, raycasterForwardVector);
+		controller.updateMatrixWorld();
+		tempMatrix.identity().extractRotation(controller.matrixWorld);
+
+		raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+		raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
 		const hits = raycaster.intersectObjects(primaryAnchor.children, true);
 		console.log("raycaster hits: ", hits);
