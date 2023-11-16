@@ -19,13 +19,13 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
+	Quaternion,
+	Raycaster,
 	Scene,
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
-	// DoubleSide,
 	CylinderGeometry,
-	// ConeGeometry
 } from 'three';
 
 import { Text } from 'troika-three-text';
@@ -39,6 +39,10 @@ let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
+let primaryAnchorMesh = null;
+
+const raycaster = new Raycaster();
+const raycasterForwardVector = new Vector3(0, 0, -1);
 
 // Initialize and animate the scene
 init();
@@ -251,19 +255,43 @@ function handleControllerDisconnected() {
 /**
  * Handles 'selectstart' event for the controller.
  */
-function handleSelectStart() {
+function handleSelectStart(e) {
+	const controller = renderer.xr.getController(e.data.handedness == 'left' ? 1 : 0);
+	console.log("controller: ", controller);
+
+	if (primaryAnchor) {
+		raycasterForwardVector.set(0, 0, -1).applyQuaternion(controller.quaternion);
+		raycaster.set(controller.position, raycasterForwardVector);
+
+		const hits = raycaster.intersectObjects(primaryAnchor.children, true);
+		console.log("raycaster hits: ", hits);
+
+		for (const hit of hits) {
+			if (hit.object && hit.object.annotationObject) {
+				const annotationObject = hit.object.annotationObject;
+				if (annotationObject.state === "complete") {
+					annotationObject.setState("playing");
+				}
+				else if (annotationObject.state === "playing") {
+					annotationObject.setState("complete");
+				}
+				return;
+			}
+		}
+	}
+
 	startCreatingAnnotationObject(scene, primaryAnchor, this.hitTestTarget);
 }
 
 /**
  * Handles 'squeezestart' event for the controller.
  */
-function handleSqueezeStart() {
+async function handleSqueezeStart() {
 	// delete old anchors
-	ratk.anchors.forEach((anchor) => {
-		console.log(anchor.anchorID);
-		ratk.deleteAnchor(anchor);
-	});
+	for(let anchor of ratk.persistentAnchors) {
+		console.log("deleting persistent anchor: ", anchor.anchorID)
+		await ratk.deleteAnchor(anchor);
+	};
 
 	// Clone the camera position and set y-coordinate to 0
 	const positionClone = camera.position.clone();
@@ -271,7 +299,7 @@ function handleSqueezeStart() {
 
 	pendingAnchorData = {
 		position: positionClone,
-		quaternion: camera.quaternion.clone(),
+		quaternion: new Quaternion(),
 	};
 }
 
@@ -285,14 +313,18 @@ function setupRATK() {
 	scene.add(ratk.root);
 	renderer.xr.addEventListener('sessionstart', () => {
 		setTimeout(() => {
-			ratk.restorePersistentAnchors().then(() => {
-				console.log("restored persistent anchors: ", ratk.anchors)
-				ratk.anchors.forEach((anchor) => {
-					primaryAnchor = anchor;
-					buildAnchorMarker(anchor, true);
-					loadAnnotationObjects(primaryAnchor);
+			try {
+				ratk.restorePersistentAnchors().then(() => {
+					console.log("restored persistent anchors: ", ratk.anchors)
+					ratk.anchors.forEach((anchor) => {
+						setPrimaryAnchor(anchor, true);
+					});
 				});
-			});
+			}
+			catch (error) {
+				console.error("error restoring anchors: ", error.message);
+				throw error;
+			}
 		}, 1000);
 		// setTimeout(() => {
 		// 	if (ratk.planes.size == 0) {
@@ -384,6 +416,7 @@ function render() {
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
+	window.audioEngine.update();
 	updateUi();
 	renderer.render(scene, camera);
 }
@@ -400,14 +433,25 @@ function handlePendingAnchors() {
 				true,
 			)
 			.then((anchor) => {
-				primaryAnchor = anchor;
-				console.log("primary anchor: ", primaryAnchor);
-
-				buildAnchorMarker(anchor, false);
-				loadAnnotationObjects(primaryAnchor);
+				setPrimaryAnchor(anchor, false);
 			});
 		pendingAnchorData = null;
 	}
+}
+
+function setPrimaryAnchor(anchor, isRecovered) {
+
+	if (primaryAnchor) {
+		scene.remove(primaryAnchor);
+		scene.remove(primaryAnchorMesh);
+	}
+
+	primaryAnchor = anchor;
+	console.log("primary anchor: ", primaryAnchor);
+
+	buildAnchorMarker(anchor, isRecovered);
+	loadAnnotationObjects(scene, anchor);
+
 }
 
 function buildAnchorMarker(anchor, isRecovered) {
@@ -415,8 +459,9 @@ function buildAnchorMarker(anchor, isRecovered) {
 	const material = new MeshBasicMaterial({
 		color: isRecovered ? 0xff0000 : 0x00ff00,
 	});
-	const cube = new Mesh(geometry, material);
-	anchor.add(cube);
+	primaryAnchorMesh = new Mesh(geometry, material);
+	anchor.add(primaryAnchorMesh);
+	scene.add(anchor);
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
 	);

@@ -56,6 +56,7 @@ export class AudioEngine {
     }
 
     update() {
+        // console.log("Setting listener position = " + this._camera.position.toArray() + ", orientation = " + this._camera.quaternion.toArray());
         this.listener.setPosition(this._camera.position);
         this.listener.setOrientation(this._camera.quaternion);
     }

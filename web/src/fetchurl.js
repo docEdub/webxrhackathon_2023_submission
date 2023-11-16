@@ -1,4 +1,5 @@
 import { Auth } from 'aws-amplify';
+import { LOADERS } from './loaders';
 import amplifyConfig from './amplifyconfigure';
 
 const API_GATEWAY_URL = amplifyConfig.Api.url;
@@ -50,3 +51,39 @@ export async function fetchAllPreSignedUrls(assetKey) {
 }
 
 export default fetchPreSignedUrl;
+
+
+const MAX_RETRIES = 3;
+
+export async function loadAsset(assetType, assetKey, processAsset, retryCount = 0) {
+    try {
+        // TODO: Switch to using the pre-signed URL from the API Gateway.
+        const preSignedUrl = assetKey;
+        // const preSignedUrl = await fetchPreSignedUrl(assetKey);
+
+        const loader = LOADERS[assetType];
+        if (!loader) {
+            throw new Error(`No loader defined for asset type: ${assetType}`);
+        }
+
+        console.log("presignedURL" + preSignedUrl);
+
+        return loader.load(preSignedUrl, processAsset, undefined, (err) => {
+            console.error(`Failed to load the asset: ${assetKey}`, err);
+            if (retryCount < MAX_RETRIES) {
+                console.log(`Retrying to load asset: ${assetKey}. Attempt ${retryCount + 1}`);
+                loadAsset(assetType, assetKey, processAsset, retryCount + 1);
+            } else {
+                console.error(`Failed to load asset: ${assetKey} after ${MAX_RETRIES} attempts.`);
+            }
+        });
+    } catch (err) {
+        console.error(`Failed to load the asset: ${assetKey}`, err.message);
+        if (retryCount < MAX_RETRIES) {
+            console.log(`Retrying to load asset: ${assetKey}. Attempt ${retryCount + 1}`);
+            loadAsset(assetType, assetKey, processAsset, retryCount + 1);
+        } else {
+            console.error(`Failed to load asset: ${assetKey} after ${MAX_RETRIES} attempts.`);
+        }
+    }
+}
