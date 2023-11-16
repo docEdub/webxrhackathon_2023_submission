@@ -284,7 +284,9 @@ function setupRATK() {
 	renderer.xr.addEventListener('sessionstart', () => {
 		setTimeout(() => {
 			ratk.restorePersistentAnchors().then(() => {
+				console.log("restored persistent anchors: ", ratk.anchors)
 				ratk.anchors.forEach((anchor) => {
+					primaryAnchor = anchor;
 					buildAnchorMarker(anchor, true);
 				});
 			});
@@ -397,6 +399,7 @@ function handlePendingAnchors() {
 			.then((anchor) => {
 				buildAnchorMarker(anchor, false);
 				primaryAnchor = anchor;
+				console.log("primary anchor: ", primaryAnchor);
 			});
 		pendingAnchorData = null;
 	}
