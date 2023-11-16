@@ -5,7 +5,7 @@ import {
     Group,
     Mesh,
     MeshBasicMaterial,
-	TorusGeometry,
+	SphereGeometry,
 } from 'three';
 
 export const annotationObjects = [];
@@ -19,7 +19,7 @@ export class AnnotationObject {
         group.position.sub(anchor.position);
         group.scale.set(0.5, 0.5, 0.5);
 
-        const geometry = new TorusGeometry(0.4, 0.1, 16, 64);
+        const geometry = new SphereGeometry(0.5);
         const material = new MeshBasicMaterial({color: 0x222222});
         const mesh = new Mesh(geometry, material);
         mesh.annotationObject = this;
