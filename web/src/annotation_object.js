@@ -14,7 +14,7 @@ export class AnnotationObject {
         sphere.position.copy(position);
         sphere.quaternion.copy(quaternion);
         sphere.scale.y = 0.001;
-        anchor.add(sphere)
+        anchor.add(sphere);
 
         this._anchor = anchor;
         this._geometry = geometry;
