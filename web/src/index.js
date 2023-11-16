@@ -4,6 +4,7 @@ import { Auth, Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
 import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
+import { startPlacingObject } from './object_placement';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -23,7 +24,7 @@ import {
 	WebGLRenderer,
 	DoubleSide,
 	CylinderGeometry,
-	ConeGeometry
+	// ConeGeometry
 } from 'three';
 import * as Tone from 'tone';
 
@@ -81,7 +82,7 @@ function setupScene() {
 function setupMenu() {
     // Create the toolbar as a thin, semitransparent box
     const toolbarGeometry = new BoxGeometry(1, 0.1, 0.01); // Adjust size as needed
-    const toolbarMaterial = new MeshBasicMaterial({ 
+    const toolbarMaterial = new MeshBasicMaterial({
         color: 0xaaaaaa, // Grey color
         transparent: true,
         opacity: 0.5
@@ -95,19 +96,19 @@ function setupMenu() {
 
     // Add toolbar as a child of the camera so it always follows the user
     toolbar.position.set(0, -1, -2); // Adjust position relative to camera
-	
+
     // Define shapes with their respective geometries and colors
     const shapes = [
         { geometry: BoxGeometry, color: 0xff0000 }, // red box
         { geometry: SphereGeometry, color: 0x00ff00 }, // green sphere
         { geometry: CylinderGeometry, color: 0x0000ff }, // blue cylinder
-        { geometry: ConeGeometry, color: 0xffff00 } // yellow cone
+        // { geometry: ConeGeometry, color: 0xffff00 } // yellow cone
     ];
 
     // Create the shapes and add them to the toolbar
     shapes.forEach((shape, index) => {
 		let geometry;
-		if (shape == SphereGeometry) {
+		if (shape.geometry == SphereGeometry) {
 			geometry = new shape.geometry(0.1); // Adjust size as needed
 		} else {
 			geometry = new shape.geometry(0.1, 0.1, 0.1); // Adjust size as needed
@@ -250,15 +251,7 @@ function handleControllerDisconnected() {
  * Handles 'selectstart' event for the controller.
  */
 function handleSelectStart() {
-	// if (this.hitTestTarget) {
-	// 	pendingAnchorData = {
-	// 		position: this.hitTestTarget.position.clone(),
-	// 		quaternion: this.hitTestTarget.quaternion.clone(),
-	// 	};
-	// 	// // call a new function
-	// 	// // place box under primary anchor
-	// 	// TODO: createChildBox(anchor, hitTestTarget)
-	// }
+	startPlacingObject(scene, primaryAnchor, this.hitTestTarget);
 }
 
 /**
@@ -274,7 +267,7 @@ function handleSqueezeStart() {
 	// Clone the camera position and set y-coordinate to 0
 	const positionClone = camera.position.clone();
 	positionClone.y = 0;
-	
+
 	pendingAnchorData = {
 		position: positionClone,
 		quaternion: camera.quaternion.clone(),
