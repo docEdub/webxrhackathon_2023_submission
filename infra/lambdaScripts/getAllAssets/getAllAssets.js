@@ -26,6 +26,11 @@ const getPresignedUrl = async (key, expires) => {
     }
 };
 
+const extractUsername = (key) => {
+    const parts = key.split('/');
+    return parts.length > 1 ? parts[0] : 'unknown';
+};
+
 const listAndGenerateUrls = async (assetKey, expires) => {
     try {
         const listParams = {
@@ -37,7 +42,9 @@ const listAndGenerateUrls = async (assetKey, expires) => {
 
         const matchingFiles = Contents.filter(item => item.Key.includes(assetKey));
         const urls = await Promise.all(matchingFiles.map(async (file) => {
-            return await getPresignedUrl(file.Key, expires);
+            const url = await getPresignedUrl(file.Key, expires);
+            const username = extractUsername(file.Key);
+            return { username, url };
         }));
 
         return urls;
