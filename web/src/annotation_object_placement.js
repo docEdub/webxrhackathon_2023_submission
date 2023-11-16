@@ -6,12 +6,13 @@ import { fetchPreSignedUrl } from "./fetchurl";
 import { getUserAnnotations } from "./cloud";
 import { putUserAnnotation } from "./cloud";
 
-const MAX_SOUND_DURATION_SECONDS = 10;
+const RECORD_PROMPT_DELAY_SECONDS = 3;
 const MAX_RECORDING_ATTEMPTS = 3;
+const MAX_SOUND_DURATION_SECONDS = 10;
 
-// let annotationObject = null;
-// let annotationSound = null;
 let recordingAttempt = 0;
+
+let annotationObject = null;
 
 export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTestTarget) => {
     if (!primaryAnchor) {
@@ -19,8 +20,14 @@ export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTest
         return;
     }
 
+    if (annotationObject) {
+        console.log("Removing existing annotation object");
+        annotationObject.dispose();
+    }
+
     console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion);
-    new AnnotationObject(scene, hitTestTarget.position, hitTestTarget.quaternion);
+    annotationObject = new AnnotationObject(scene, hitTestTarget.position, hitTestTarget.quaternion);
+    annotationObject.setState("placed");
 
     const annotationData = {
         type: 'audio',
@@ -40,7 +47,21 @@ export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTest
     putUserAnnotation(annotationData);
 
     recordingAttempt = 0;
-    recordAnnotationSound();
+    promptUserAndRecord();
+}
+
+const promptUserAndRecord = () => {
+    showRecordingPrompt()
+    setTimeout(() => {
+        hideRecordingPrompt();
+        recordAnnotationSound();
+    }, RECORD_PROMPT_DELAY_SECONDS * 1000);
+}
+
+const showRecordingPrompt = () => {
+}
+
+const hideRecordingPrompt = () => {
 }
 
 const recordAnnotationSound = async () => {
@@ -50,6 +71,8 @@ const recordAnnotationSound = async () => {
     recordingAttempt++;
 
     console.log("Recording annotation sound ...");
+
+    annotationObject.setState("recording");
 
     try {
         // Request access to the microphone
@@ -95,6 +118,7 @@ const recordAnnotationSound = async () => {
         // Stop recording after a desired duration
         setTimeout(() => {
             mediaRecorder.stop();
+            annotationObject.setState("recording-done");
         }, MAX_SOUND_DURATION_SECONDS * 1000);
 
     } catch (error) {
@@ -120,6 +144,8 @@ const createAudioAnnotationSource = async (audioFileUrl, position) => {
     await audioSource.load(blob);
 
     audioSource.setPosition(position);
+
+    annotationObject.setState("complete");
 
     // For testing only.
     // audioSource.play();
