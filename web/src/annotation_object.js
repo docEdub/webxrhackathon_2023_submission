@@ -28,12 +28,10 @@ export class AnnotationObject {
 
             const root = gltf.scene.children[0];
             root.position.set(0, 0, 0);
-            root.quaternion.set(0, 0, 0, 1);
             root.rotation.set(0, 0, 0);
 
             const firstChild = root.children[0];
             firstChild.position.set(0, 0, 0);
-            firstChild.quaternion.set(0, 0, 0, 1);
             firstChild.rotation.set(0, 0, 0);
 
             group.add(gltf.scene);
