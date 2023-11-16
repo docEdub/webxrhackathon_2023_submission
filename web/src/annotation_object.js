@@ -2,7 +2,6 @@
 import { loadAsset } from './fetchurl.js';
 
 import {
-    DoubleSide,
     Group,
     Mesh,
     MeshBasicMaterial,
@@ -21,7 +20,7 @@ export class AnnotationObject {
         group.scale.set(0.5, 0.5, 0.5);
 
         const geometry = new TorusGeometry(0.4, 0.1, 16, 64);
-        const material = new MeshBasicMaterial({color: 0x222222, side: DoubleSide});
+        const material = new MeshBasicMaterial({color: 0x222222});
         const mesh = new Mesh(geometry, material);
         mesh.annotationObject = this;
         mesh.rotation.x = Math.PI / 2;
@@ -86,7 +85,7 @@ export class AnnotationObject {
     }
 
     update() {
-        if (this.state == "playing") {
+        if (this.state == "playing" && this._gltf) {
             this._gltf.rotation.y += 0.1;
         }
     }
