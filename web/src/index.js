@@ -3,7 +3,7 @@ import './styles/index.css';
 import { Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
 import { fetchAllPreSignedUrls } from './fetchurl';
-import { getAllAnnotations, recordAndUploadWebMAudio, fetchAllTextFiles } from './cloud';
+//import { getAllAnnotations, recordAndUploadWebMAudio, fetchAllTextFiles } from './cloud';
 import { AudioEngine } from './audio';
 import { startCreatingAnnotationObject } from './annotation_object_creation';
 import { loadAnnotationObjects } from './load_annotation_objects';
@@ -506,11 +506,11 @@ export async function fetchAllAudioFiles() {
 
 //iife test
 (async () => {
-    recordAndUploadWebMAudio(true);
-    const audioFiles = await fetchAllAudioFiles();
-    console.log(audioFiles);
-    const allAnnotations = await getAllAnnotations();
-    console.log(allAnnotations);
-    const allText = await fetchAllTextFiles();
-    console.log(allText);
+//    recordAndUploadWebMAudio(true);
+//    const audioFiles = await fetchAllAudioFiles();
+//    console.log(audioFiles);
+//    const allAnnotations = await getAllAnnotations();
+//    console.log(allAnnotations);
+//    const allText = await fetchAllTextFiles();
+//    console.log(allText);
 })();
