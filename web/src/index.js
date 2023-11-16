@@ -53,7 +53,8 @@ function init() {
 	setupLighting();
 	setupRenderer();
 	setupARButton();
-	setupController();
+	setupController(0);
+	setupController(1);
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
 	setupScene();
@@ -197,8 +198,8 @@ function setupARButton() {
 /**
  * Sets up the XR controller and its event listeners.
  */
-function setupController() {
-	controller = renderer.xr.getController(0);
+function setupController(controllerIndex) {
+	controller = renderer.xr.getController(controllerIndex);
 	controller.addEventListener('connected', handleControllerConnected);
 	controller.addEventListener('disconnected', handleControllerDisconnected);
 	controller.addEventListener('selectstart', handleSelectStart);
@@ -217,7 +218,7 @@ function setupController() {
 		new Vector3(0, 0, -1),
 	]);
 	const line = new Line(geometry);
-	renderer.xr.getController(0).add(line);
+	renderer.xr.getController(controllerIndex).add(line);
 }
 
 /**
