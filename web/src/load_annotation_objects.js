@@ -15,19 +15,25 @@ export const loadAnnotationObjects = async (scene, anchor) => {
     console.log(audioFiles);
 
     // TODO: How to we tie annotations to audio files?
-    // Just load the first of each one for now.
-    const audioFile = audioFiles[0];
-    const annotation = audioAnnotations[0];
+    // Just all of them for now, unmatched.
+    for (let i = 0; i < annotations.length; i++) {
+        const annotation = audioAnnotations[i];
+        const audioFile = audioFiles[i];
 
-    const annotationObject = new AnnotationObject(scene, anchor, annotation.position, annotation.orientation);
-    annotationObject.setState("complete");
+        if (!annotation || !audioFile) {
+            continue;
+        }
 
-    const audioSource =
-        await createAudioAnnotationSource(audioFile, annotation.position);
+        const annotationObject = new AnnotationObject(scene, anchor, annotation.position, annotation.orientation);
+        annotationObject.setState("complete");
 
-    // For testing only.
-    annotationObject.setState("playing");
-    audioSource.play();
+        const audioSource =
+            await createAudioAnnotationSource(audioFile, annotation.position);
+
+        // For testing only.
+        annotationObject.setState("playing");
+        audioSource.play();
+    }
 
     console.log("Loading annotation objects - done");
 }
