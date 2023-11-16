@@ -19,6 +19,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
+	Raycaster,
 	Scene,
 	SphereGeometry,
 	Vector3,
@@ -39,6 +40,9 @@ let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
+
+const raycaster = new Raycaster();
+const raycasterForwardVector = new Vector3(0, 0, -1);
 
 // Initialize and animate the scene
 init();
@@ -251,7 +255,31 @@ function handleControllerDisconnected() {
 /**
  * Handles 'selectstart' event for the controller.
  */
-function handleSelectStart() {
+function handleSelectStart(e) {
+	const controller = renderer.xr.getController(e.data.handedness == 'left' ? 1 : 0);
+	console.log("controller: ", controller);
+
+	if (primaryAnchor) {
+		raycasterForwardVector.set(0, 0, -1).applyQuaternion(controller.quaternion);
+		raycaster.set(controller.position, raycasterForwardVector);
+
+		const hits = raycaster.intersectObjects(primaryAnchor.children, true);
+		console.log("raycaster hits: ", hits);
+
+		for (const hit of hits) {
+			if (hit.object && hit.object.annotationObject) {
+				const annotationObject = hit.object.annotationObject;
+				if (annotationObject.state === "complete") {
+					annotationObject.setState("playing");
+				}
+				else if (annotationObject.state === "playing") {
+					annotationObject.setState("complete");
+				}
+				return;
+			}
+		}
+	}
+
 	startCreatingAnnotationObject(scene, primaryAnchor, this.hitTestTarget);
 }
 

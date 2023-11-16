@@ -22,11 +22,12 @@ export const loadAnnotationObjects = async (scene, anchor) => {
     const annotationObject = new AnnotationObject(scene, anchor, annotation.position, annotation.orientation);
     annotationObject.setState("complete");
 
-    const audioSource = await createAudioAnnotationSource(audioFile, annotation.position);
+    // const audioSource =
+        await createAudioAnnotationSource(audioFile, annotation.position);
 
     // For testing only.
-    annotationObject.setState("playing");
-    audioSource.play();
+    // annotationObject.setState("playing");
+    // audioSource.play();
 
     console.log("Loading annotation objects - done");
 }
