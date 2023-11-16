@@ -31,6 +31,16 @@ export class AudioEngine {
         return source;
     }
 
+    removeSource(username) {
+        const source = this.getSourceByUsername(username);
+        if (!source) {
+            return;
+        }
+        source.stop();
+        source.getOutputNode().disconnect(this._destinationNode);
+        this._sources = this._sources.filter(s => s !== source);
+    }
+
     getSourceByUsername(username) {
         return this._sources.find(source => source._username === username);
     }

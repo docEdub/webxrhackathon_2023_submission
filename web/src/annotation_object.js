@@ -10,6 +10,15 @@ import {
 
 export const annotationObjects = [];
 
+export const removeAnnotationObjectsByUsername = (username) => {
+    const annotationObjectsToRemove = annotationObjects.filter(annotationObject => annotationObject.username === username);
+    annotationObjectsToRemove.forEach(annotationObject => {
+        annotationObject.dispose();
+    });
+
+    window.audioEngine.removeSource(username);
+}
+
 export class AnnotationObject {
     constructor(scene, anchor, username, position, quaternion) {
         this.username = username;

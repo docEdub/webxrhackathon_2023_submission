@@ -5,6 +5,7 @@ import { fetchAudioUrlByUser } from "./cloud";
 import { fetchPreSignedUrl } from "./fetchurl";
 import { getUserAnnotations } from "./cloud";
 import { putUserAnnotation } from "./cloud";
+import { removeAnnotationObjectsByUsername } from "./annotation_object";
 
 const RECORD_PROMPT_DELAY_SECONDS = 3;
 const MAX_RECORDING_ATTEMPTS = 3;
@@ -40,6 +41,8 @@ export const startCreatingAnnotationObject = async (scene, anchor, hitTestTarget
 
     const user = await Auth.currentAuthenticatedUser();
     const username = user.username;
+
+    removeAnnotationObjectsByUsername(username);
 
     console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion, " and username ", username);
     annotationObject = new AnnotationObject(scene, primaryAnchor, username, hitTestTarget.position, hitTestTarget.quaternion);
