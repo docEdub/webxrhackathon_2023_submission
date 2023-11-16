@@ -5,6 +5,7 @@ import amplifyConfig from './amplifyconfigure';
 import { fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
 import { startCreatingAnnotationObject } from './annotation_object_creation';
+import { loadAnnotationObjects } from './load_annotation_objects';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -289,6 +290,7 @@ function setupRATK() {
 				ratk.anchors.forEach((anchor) => {
 					primaryAnchor = anchor;
 					buildAnchorMarker(anchor, true);
+					loadAnnotationObjects(primaryAnchor);
 				});
 			});
 		}, 1000);
@@ -398,9 +400,11 @@ function handlePendingAnchors() {
 				true,
 			)
 			.then((anchor) => {
-				buildAnchorMarker(anchor, false);
 				primaryAnchor = anchor;
 				console.log("primary anchor: ", primaryAnchor);
+
+				buildAnchorMarker(anchor, false);
+				loadAnnotationObjects(primaryAnchor);
 			});
 		pendingAnchorData = null;
 	}
