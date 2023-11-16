@@ -2,7 +2,7 @@ import './styles/index.css';
 
 import { Auth, Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
-import { testAudio, testAnnotations } from './cloud';
+import { testAnnotations } from './cloud';
 import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
 import { startPlacingAnnotationObject } from './annotation_object_placement';
