@@ -122,5 +122,5 @@ const createAudioAnnotationSource = async (audioFileUrl, position) => {
     audioSource.setPosition(position);
 
     // For testing only.
-    audioSource.play();
+    // audioSource.play();
 }
