@@ -21,7 +21,7 @@ export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTest
     }
 
     if (annotationObject) {
-        if (annotationObject.state != "error") {
+        if (annotationObject.state != "error" && annotationObject.state != "complete") {
             console.log("Already creating annotation");
             return;
         }
