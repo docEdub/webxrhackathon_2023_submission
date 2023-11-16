@@ -195,6 +195,7 @@ function setupARButton() {
 			'mesh-detection',
 			'local-floor',
 		],
+		ENTER_XR_TEXT: 'Start',
 		onUnsupported: () => {
 			arButton.style.display = 'none';
 			webLaunchButton.style.display = 'block';
