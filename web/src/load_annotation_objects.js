@@ -3,6 +3,7 @@ import { createAudioAnnotationSource } from "./annotation_object_creation";
 import { fetchAllAudioFiles } from "./cloud";
 import { getAllAnnotations } from "./cloud";
 import { AnnotationObject } from "./annotation_object";
+import { updateUserTextRecords } from "./user_text_records";
 
 export const loadAnnotationObjects = async (scene, anchor) => {
     console.log("Loading annotation objects ...");
@@ -40,6 +41,8 @@ export const loadAnnotationObjects = async (scene, anchor) => {
         // For testing only.
         // annotationObject.setState("playing");
         // audioSource.play();
+
+        updateUserTextRecords();
     }
 
     console.log("Loading annotation objects - done");
