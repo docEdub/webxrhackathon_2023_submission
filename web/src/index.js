@@ -384,6 +384,7 @@ function render() {
 	handlePendingAnchors();
 	ratk.update();
 	updateSemanticLabels();
+	window.audioEngine.update();
 	updateUi();
 	renderer.render(scene, camera);
 }

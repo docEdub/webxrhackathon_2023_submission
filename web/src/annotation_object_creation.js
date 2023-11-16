@@ -157,4 +157,6 @@ export const createAudioAnnotationSource = async (audioFileUrl, position) => {
 
     // For testing only.
     // audioSource.play();
+
+    return audioSource;
 }
