@@ -6,15 +6,25 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
 }
 
-#welcome-text {
-    font-size: 24px;
+h1 {
     text-align: center;
-    margin-bottom: 20px;
+    width: 100%; /* Ensures full width for center alignment */
+    color: rgb(162, 0, 255);
+    font-size: 90px;
+    margin-bottom: 0; /* Reduce bottom margin of h1 */
+}
+
+h2 {
+    text-align: center;
+    width: 100%; /* Ensures full width for center alignment */
+    color: rgb(162, 0, 255);
+    font-size: 40px;
 }
 
 #auth-container {
@@ -24,11 +34,11 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 300px;
     text-align: center;
+    margin: 10px 0; /* Adds some space between elements */
 }
 
 input[type="text"],
-input[type="password"],
-input[type="email"] {
+input[type="password"]{
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -42,7 +52,7 @@ button {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    background-color: #007BFF;
+    background-color: rgb(162, 0, 255);
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -52,21 +62,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
-}
-
-
-#facebookSignInButton {
-    background-color: #1877F2;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-#facebookSignInButton:hover {
-    background-color: #1664D1;
+    background-color: rgb(196, 93, 255);
 }
 
 #message {

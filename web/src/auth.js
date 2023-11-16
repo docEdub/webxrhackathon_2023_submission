@@ -11,15 +11,11 @@ const messageDiv = document.getElementById('message');
 const handleSignUp = async () => {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    const email = document.getElementById('email').value; // If using email
 
     try {
         const { user } = await Auth.signUp({
             username,
-            password,
-            attributes: {
-                email // If using email
-            }
+            password
         });
         console.log('Sign up success!', user);
         // Handle successful sign-up logic here
