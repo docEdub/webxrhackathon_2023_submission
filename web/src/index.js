@@ -1,6 +1,6 @@
 import './styles/index.css';
 
-import { Amplify } from 'aws-amplify';
+import { Auth, Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
 import { testAudio, testAnnotations } from './cloud';
 import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
@@ -562,6 +562,6 @@ export async function recordAndUploadWebMAudio() {
  Test Audio and Annotation in Cloud
  **/
  (async () => {
-     await testAudio();
+     //await testAudio();
      await testAnnotations();
  })();
