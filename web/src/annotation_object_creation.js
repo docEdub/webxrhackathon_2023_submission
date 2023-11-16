@@ -5,6 +5,7 @@ import { fetchAudioUrlByUser } from "./cloud";
 import { fetchPreSignedUrl } from "./fetchurl";
 import { getUserAnnotations } from "./cloud";
 import { putUserAnnotation } from "./cloud";
+import { removeAnnotationObjectsByUsername } from "./annotation_object";
 
 const RECORD_PROMPT_DELAY_SECONDS = 3;
 const MAX_RECORDING_ATTEMPTS = 3;
@@ -12,16 +13,19 @@ const MAX_SOUND_DURATION_SECONDS = 10;
 
 let recordingAttempt = 0;
 
+let primaryAnchor = null;
 let annotationObject = null;
 
-export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTestTarget) => {
-    if (!primaryAnchor) {
-        console.log("No primaryAnchor, returning");
+export const startCreatingAnnotationObject = async (scene, anchor, hitTestTarget) => {
+    if (!anchor) {
+        console.log("No anchor, returning");
         return;
     }
 
+    primaryAnchor = anchor;
+
     if (annotationObject) {
-        if (annotationObject.state != "error") {
+        if (annotationObject.state != "error" && annotationObject.state != "complete") {
             console.log("Already creating annotation");
             return;
         }
@@ -30,8 +34,18 @@ export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTest
         annotationObject.dispose();
     }
 
-    console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion);
-    annotationObject = new AnnotationObject(scene, hitTestTarget.position, hitTestTarget.quaternion);
+    if (!hitTestTarget) {
+        console.log("No hit test target, returning");
+        return;
+    }
+
+    const user = await Auth.currentAuthenticatedUser();
+    const username = user.username;
+
+    removeAnnotationObjectsByUsername(username);
+
+    console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion, " and username ", username);
+    annotationObject = new AnnotationObject(scene, primaryAnchor, username, hitTestTarget.position, hitTestTarget.quaternion);
     annotationObject.setState("placed");
 
     const annotationData = {
@@ -107,11 +121,12 @@ const recordAnnotationSound = async () => {
 
                 const user = await Auth.currentAuthenticatedUser();
                 const username = user.username;
-                const audioFileUrl = await fetchAudioUrlByUser(username);
+                const audioRecord = await fetchAudioUrlByUser(username);
 
                 const audioAnnotation = annotations.filter(annotation => annotation.type === 'audio')[0];
 
-                createAudioAnnotationSource(audioFileUrl, audioAnnotation.position, audioAnnotation.orientation);
+                await createAudioAnnotationSource(username, audioRecord, audioAnnotation.position, audioAnnotation.orientation);
+                annotationObject.setState("complete");
             } else {
                 console.error('Audio upload failed');
                 recordAnnotationSound();
@@ -133,8 +148,8 @@ const recordAnnotationSound = async () => {
     }
 }
 
-const createAudioAnnotationSource = async (audioFileUrl, position) => {
-    const audioSource = window.audioEngine.createSource();
+export const createAudioAnnotationSource = async (username, audioFileUrl, position) => {
+    const audioSource = window.audioEngine.createSource(username);
 
     console.log("Fetching audio from " + audioFileUrl);
     const response = await fetch(audioFileUrl);
@@ -151,8 +166,9 @@ const createAudioAnnotationSource = async (audioFileUrl, position) => {
 
     audioSource.setPosition(position);
 
-    annotationObject.setState("complete");
-
     // For testing only.
+    // annotationObject.setState("playing");
     // audioSource.play();
+
+    return audioSource;
 }

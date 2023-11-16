@@ -24,27 +24,25 @@ export class AudioEngine {
         }
     }
 
-    createSource(id) {
-        const source = new AudioSource(this, id);
+    createSource(username) {
+        const source = new AudioSource(this, username);
         this._sources.push(source);
         source.getOutputNode().connect(this._destinationNode);
         return source;
     }
 
-    getSourceById(id) {
-        return this._sources.find(source => source._id === id);
+    removeSource(username) {
+        const source = this.getSourceByUsername(username);
+        if (!source) {
+            return;
+        }
+        source.stop();
+        source.getOutputNode().disconnect(this._destinationNode);
+        this._sources = this._sources.filter(s => s !== source);
     }
 
-    async createRecording() {
-        const recorder = new AudioRecorder(this);
-        recorder.start();
-
-        return new Promise(resolve => {
-            setTimeout(() => {
-                recorder.stop();
-                resolve(recorder.getBlob());
-            }, this.recordingDuration * 1000);
-        });
+    getSourceByUsername(username) {
+        return this._sources.find(source => source._username === username);
     }
 
     getRampTime() {
@@ -56,6 +54,7 @@ export class AudioEngine {
     }
 
     update() {
+        // console.log("Setting listener position = " + this._camera.position.toArray() + ", orientation = " + this._camera.quaternion.toArray());
         this.listener.setPosition(this._camera.position);
         this.listener.setOrientation(this._camera.quaternion);
     }
@@ -101,9 +100,9 @@ export class AudioListener {
 }
 
 export class AudioSource {
-    constructor(audioEngine, id) {
+    constructor(audioEngine, username) {
         this._audioEngine = audioEngine;
-        this._id = id;
+        this._username = username;
 
         this._position = new Vector3();
 
@@ -111,6 +110,8 @@ export class AudioSource {
         this._pannerNode = new PannerNode(this._audioEngine.audioContext);
 
         this._gainNode.connect(this._pannerNode);
+
+        this._started = false;
     }
 
     async load(blob) {
@@ -122,6 +123,8 @@ export class AudioSource {
         }
         this._audioBufferSourceNode = new AudioBufferSourceNode(this._audioEngine.audioContext, { buffer: this._audioBuffer });
         this._audioBufferSourceNode.connect(this._gainNode);
+
+        this._started = false;
     }
 
     getOutputNode() {
@@ -138,7 +141,11 @@ export class AudioSource {
         this._pannerNode.positionZ.linearRampToValueAtTime(vec3.z, rampTime);
     }
 
-    play() {
+    async play() {
+        if (this._started) {
+            await this.load(this._blob);
+        }
+        this._started = true;
         this._audioBufferSourceNode.start();
         this._audioBufferSourceNode.onended = () => {
             this._loopTimeoutId = setTimeout(async () => {
@@ -152,24 +159,11 @@ export class AudioSource {
     stop() {
         this._audioBufferSourceNode.onended = null;
         clearTimeout(this._loopTimeoutId);
+
+        // Don't call stop() if the buffer was never started. WebAudio API doesn't like that.
+        if (!this._started) {
+            return;
+        }
         this._audioBufferSourceNode.stop();
-    }
-}
-
-export class AudioRecorder {
-    constructor(audioEngine) {
-        this._audioEngine = audioEngine;
-    }
-
-    start() {
-
-    }
-
-    stop() {
-
-    }
-
-    getBlob() {
-
     }
 }
