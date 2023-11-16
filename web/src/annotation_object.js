@@ -41,10 +41,13 @@ export class AnnotationObject {
             this._material.color.setHex(0x00ffff);
         }
         else if (state == "complete") {
+            this._material.color.setHex(0xff00ff);
+        }
+        else if (state == "playing") {
             this._material.color.setHex(0x00ff00);
         }
         else if (state == "error") {
-            this._material.color.setHex(0xff00ff);
+            this._material.color.setHex(0xaaaaaa);
         }
     }
 }

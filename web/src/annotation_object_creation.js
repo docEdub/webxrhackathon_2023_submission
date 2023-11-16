@@ -156,6 +156,7 @@ export const createAudioAnnotationSource = async (audioFileUrl, position) => {
     audioSource.setPosition(position);
 
     // For testing only.
+    // annotationObject.setState("playing");
     // audioSource.play();
 
     return audioSource;

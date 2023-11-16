@@ -25,6 +25,7 @@ export const loadAnnotationObjects = async (scene, anchor) => {
     const audioSource = await createAudioAnnotationSource(audioFile, annotation.position);
 
     // For testing only.
+    annotationObject.setState("playing");
     audioSource.play();
 
     console.log("Loading annotation objects - done");
