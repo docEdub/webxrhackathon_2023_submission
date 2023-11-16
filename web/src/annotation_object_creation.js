@@ -14,7 +14,7 @@ let recordingAttempt = 0;
 
 let annotationObject = null;
 
-export const startPlacingAnnotationObject = async (scene, primaryAnchor, hitTestTarget) => {
+export const startCreatingAnnotationObject = async (scene, primaryAnchor, hitTestTarget) => {
     if (!primaryAnchor) {
         console.log("No primaryAnchor, returning");
         return;

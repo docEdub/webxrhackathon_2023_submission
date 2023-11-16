@@ -4,7 +4,7 @@ import { Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
 import { fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
-import { startPlacingAnnotationObject } from './annotation_object_placement';
+import { startCreatingAnnotationObject } from './annotation_object_creation';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -251,7 +251,7 @@ function handleControllerDisconnected() {
  * Handles 'selectstart' event for the controller.
  */
 function handleSelectStart() {
-	startPlacingAnnotationObject(scene, primaryAnchor, this.hitTestTarget);
+	startCreatingAnnotationObject(scene, primaryAnchor, this.hitTestTarget);
 }
 
 /**
