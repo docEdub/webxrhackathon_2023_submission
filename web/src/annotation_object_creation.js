@@ -5,6 +5,7 @@ import { fetchAudioUrlByUser } from "./cloud";
 import { fetchPreSignedUrl } from "./fetchurl";
 import { getUserAnnotations } from "./cloud";
 import { putUserAnnotation } from "./cloud";
+import { removeAnnotationObjectsByUsername } from "./annotation_object";
 
 const RECORD_PROMPT_DELAY_SECONDS = 3;
 const MAX_RECORDING_ATTEMPTS = 3;
@@ -38,8 +39,13 @@ export const startCreatingAnnotationObject = async (scene, anchor, hitTestTarget
         return;
     }
 
-    console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion);
-    annotationObject = new AnnotationObject(scene, primaryAnchor, hitTestTarget.position, hitTestTarget.quaternion);
+    const user = await Auth.currentAuthenticatedUser();
+    const username = user.username;
+
+    removeAnnotationObjectsByUsername(username);
+
+    console.log("Creating new object at ", hitTestTarget.position, " with quaternion ", hitTestTarget.quaternion, " and username ", username);
+    annotationObject = new AnnotationObject(scene, primaryAnchor, username, hitTestTarget.position, hitTestTarget.quaternion);
     annotationObject.setState("placed");
 
     const annotationData = {
@@ -115,11 +121,11 @@ const recordAnnotationSound = async () => {
 
                 const user = await Auth.currentAuthenticatedUser();
                 const username = user.username;
-                const audioFileUrl = await fetchAudioUrlByUser(username);
+                const audioRecord = await fetchAudioUrlByUser(username);
 
                 const audioAnnotation = annotations.filter(annotation => annotation.type === 'audio')[0];
 
-                await createAudioAnnotationSource(audioFileUrl, audioAnnotation.position, audioAnnotation.orientation);
+                await createAudioAnnotationSource(username, audioRecord, audioAnnotation.position, audioAnnotation.orientation);
                 annotationObject.setState("complete");
             } else {
                 console.error('Audio upload failed');
@@ -142,8 +148,8 @@ const recordAnnotationSound = async () => {
     }
 }
 
-export const createAudioAnnotationSource = async (audioFileUrl, position) => {
-    const audioSource = window.audioEngine.createSource();
+export const createAudioAnnotationSource = async (username, audioFileUrl, position) => {
+    const audioSource = window.audioEngine.createSource(username);
 
     console.log("Fetching audio from " + audioFileUrl);
     const response = await fetch(audioFileUrl);

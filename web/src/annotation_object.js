@@ -10,8 +10,19 @@ import {
 
 export const annotationObjects = [];
 
+export const removeAnnotationObjectsByUsername = (username) => {
+    const annotationObjectsToRemove = annotationObjects.filter(annotationObject => annotationObject.username === username);
+    annotationObjectsToRemove.forEach(annotationObject => {
+        annotationObject.dispose();
+    });
+
+    window.audioEngine.removeSource(username);
+}
+
 export class AnnotationObject {
-    constructor(scene, anchor, position, quaternion) {
+    constructor(scene, anchor, username, position, quaternion) {
+        this.username = username;
+
         const group = new Group();
         group.position.copy(position);
         group.quaternion.copy(quaternion);
@@ -75,9 +86,18 @@ export class AnnotationObject {
         }
         else if (state == "complete") {
             this._material.color.setHex(0xff00ff);
+            const audioSource = window.audioEngine.getSourceByUsername(this.username);
+            if (audioSource) {
+                audioSource.stop();
+            }
         }
         else if (state == "playing") {
             this._material.color.setHex(0x00ff00);
+
+            const audioSource = window.audioEngine.getSourceByUsername(this.username);
+            if (audioSource) {
+                audioSource.play();
+            }
         }
         else if (state == "error") {
             this._material.color.setHex(0xaaaaaa);

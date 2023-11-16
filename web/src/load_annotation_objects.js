@@ -7,32 +7,39 @@ import { AnnotationObject } from "./annotation_object";
 export const loadAnnotationObjects = async (scene, anchor) => {
     console.log("Loading annotation objects ...");
 
+    // username.
     const annotations = await getAllAnnotations();
     const audioAnnotations = annotations.filter(annotation => annotation.type === 'audio');
     console.log(audioAnnotations);
 
-    const audioFiles = await fetchAllAudioFiles();
-    console.log(audioFiles);
+    const audioRecords = await fetchAllAudioFiles();
+    console.log(audioRecords);
+    // username.
+    // url.
 
-    // TODO: How to we tie annotations to audio files?
-    // Just all of them for now, unmatched.
     for (let i = 0; i < annotations.length; i++) {
         const annotation = audioAnnotations[i];
-        const audioFile = audioFiles[i];
-
-        if (!annotation || !audioFile) {
+        if (!annotation) {
             continue;
         }
 
-        const annotationObject = new AnnotationObject(scene, anchor, annotation.position, annotation.orientation);
+        const username = annotation.username;
+
+        // Find the audio record that matches this annotation's username.
+        const audioRecord = audioRecords.find(record => record.username === username);
+        if (!audioRecord) {
+            continue;
+        }
+
+        const annotationObject = new AnnotationObject(scene, anchor, username, annotation.position, annotation.orientation);
         annotationObject.setState("complete");
 
-        const audioSource =
-            await createAudioAnnotationSource(audioFile, annotation.position);
+        // const audioSource =
+            await createAudioAnnotationSource(username, audioRecord.url, annotation.position);
 
         // For testing only.
-        annotationObject.setState("playing");
-        audioSource.play();
+        // annotationObject.setState("playing");
+        // audioSource.play();
     }
 
     console.log("Loading annotation objects - done");
