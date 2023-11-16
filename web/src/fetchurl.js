@@ -1,7 +1,7 @@
 import { Auth } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
 
-const API_GATEWAY_URL = amplifyConfig.Api.url + 'assets';
+const API_GATEWAY_URL = amplifyConfig.Api.url;
 
 export async function fetchPreSignedUrl(assetKey, action = 'GET') {
     try {
@@ -10,7 +10,7 @@ export async function fetchPreSignedUrl(assetKey, action = 'GET') {
 
         console.log("assetkey is" + assetKey);
 
-        const response = await fetch(`${API_GATEWAY_URL}?assetKey=${assetKey}`, {
+        const response = await fetch(`${API_GATEWAY_URL}assets?assetKey=${assetKey}`, {
           headers: {
             Authorization: idToken,
             'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export async function fetchAllPreSignedUrls(assetKey) {
 
         console.log("assetkey is" + assetKey);
 
-        const response = await fetch(`${API_GATEWAY_URL}/all?assetKey=${assetKey}`, {
+        const response = await fetch(`${API_GATEWAY_URL}assets/all?assetKey=${assetKey}`, {
           headers: {
             Authorization: idToken,
             'Content-Type': 'application/json',
