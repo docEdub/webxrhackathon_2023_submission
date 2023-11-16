@@ -22,7 +22,7 @@ import {
 	SphereGeometry,
 	Vector3,
 	WebGLRenderer,
-	DoubleSide,
+	// DoubleSide,
 	CylinderGeometry,
 	// ConeGeometry
 } from 'three';
@@ -64,11 +64,11 @@ function init() {
  * Creates black sky sphere to block out AR camera
  */
 function setupScene() {
-	const geometry = new SphereGeometry(150);
-	const material = new MeshBasicMaterial({color: 0x000000, side: DoubleSide});
-	const skySphere = new Mesh(geometry, material);
+	// const geometry = new SphereGeometry(150);
+	// const material = new MeshBasicMaterial({color: 0x000000, side: DoubleSide});
+	// const skySphere = new Mesh(geometry, material);
+	// scene.add(skySphere)
 	// this.hitTestTarget.add(hitTestMarker);
-	scene.add(skySphere)
 }
 
 /**
@@ -291,11 +291,11 @@ function setupRATK() {
 				});
 			});
 		}, 1000);
-		setTimeout(() => {
-			if (ratk.planes.size == 0) {
-				renderer.xr.getSession().initiateRoomCapture();
-			}
-		}, 5000);
+		// setTimeout(() => {
+		// 	if (ratk.planes.size == 0) {
+		// 		renderer.xr.getSession().initiateRoomCapture();
+		// 	}
+		// }, 5000);
 	});
 }
 
