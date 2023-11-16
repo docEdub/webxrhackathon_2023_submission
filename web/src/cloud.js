@@ -147,6 +147,31 @@ export async function fetchAllAudioFiles() {
     }
 }
 
+export async function fetchAllTextFiles() {
+    try {
+        // Common asset key name
+        const assetKey = 'sound.txt';
+
+        // Fetch the pre-signed URLs for the audio files
+        const preSignedUrls = await fetchAllPreSignedUrls(assetKey);
+
+        console.log(preSignedUrls);
+
+        // Map each URL to a fetch request and wait for all of them to complete
+        const textFetchPromises = preSignedUrls.map(async (url) => {
+            const textUrl = await fetch(url.url);
+            const text = await textUrl.text();
+            return { username: url.username, text: text };
+        });
+
+        const mappedToText = await Promise.all(textFetchPromises);
+        return mappedToText;
+
+    } catch (error) {
+        console.error('Failed to fetch text files:', error);
+    }
+}
+
 export async function recordAndUploadWebMAudio(hearAudio = false) {
     try {
         // Request access to the microphone

@@ -31,7 +31,7 @@ export async function fetchAllPreSignedUrls(assetKey) {
         const session = await Auth.currentSession();
         const idToken = session.getIdToken().getJwtToken();
 
-        console.log("assetkey is" + assetKey);
+        console.log("assetkey is " + assetKey);
 
         const response = await fetch(`${API_GATEWAY_URL}assets/all?assetKey=${assetKey}`, {
           headers: {

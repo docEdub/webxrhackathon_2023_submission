@@ -1,6 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import * as helpers from '../components/helperScripts';
-import * as iam from 'aws-cdk-lib/aws-iam'
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import { S3Bucket } from '../components/s3';
 import {  LambdaStack } from '../components/lambda';
 import { DDBTable } from '../components/ddb';
@@ -71,7 +74,6 @@ export class Main {
         resources: [indexArn],
     }));
 
-
     //Build Cognito Stack
     const cognitoStack = new CognitoStack(scope, "auth", true, true);
   
@@ -86,6 +88,23 @@ export class Main {
     apiGateway.AddMethodIntegration(getUserAnnotationsLambda.MethodIntegration(), "annotation", "GET", apiAuthorizer);
     apiGateway.AddMethodIntegration(putUserAnnotationLambda.MethodIntegration(), "annotation", "PUT", apiAuthorizer);
     apiGateway.AddMethodIntegration(getAllAnnotationsLambda.MethodIntegration(), "annotations/all", "GET", apiAuthorizer);
+
+    // Create a Lambda function for processing audio files
+    const processAudioLambda = new LambdaStack(scope, "processAudioLambda", cdk.aws_lambda.Runtime.NODEJS_18_X,
+     '../lambdaScripts/processAudio', 'handler', cdk.Duration.minutes(5), 512, 512, storageEnvs);
+
+    // Set up S3 event trigger for new or modified .webm files
+    storageBucket.addEventNotification(s3.EventType.OBJECT_CREATED_PUT, new s3n.LambdaDestination(processAudioLambda.lambdaFunction), {
+      prefix: '',
+      suffix: '.webm'
+    });
+
+    // Grant necessary permissions to the Lambda function
+    storageBucket.grantReadWrite(processAudioLambda.lambdaFunction);
+    processAudioLambda.lambdaFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: ["transcribe:StartTranscriptionJob", "transcribe:GetTranscriptionJob"],
+      resources: ["*"] // Consider specifying more granular permissions
+    }));
 
     //Upload Website
     const website = new WebSiteDeployment(scope, "webDeployment", '../../web/dist', 'index.html', apiGateway, storageBucket);
