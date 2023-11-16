@@ -8,13 +8,14 @@ import { AudioEngine } from './audio';
 import { startCreatingAnnotationObject } from './annotation_object_creation';
 import { loadAnnotationObjects } from './load_annotation_objects';
 import { annotationObjects } from './annotation_object';
+import { getUserText } from './user_text_records';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
 	BoxGeometry,
 	BufferGeometry,
 	DirectionalLight,
-	// Group,
+	Group,
 	HemisphereLight,
 	Line,
 	Matrix4,
@@ -37,7 +38,7 @@ Amplify.configure(amplifyConfig);
 
 // Global variables for scene components
 
-let camera, scene, renderer, controller /*, uiGroup*/;
+let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
@@ -67,7 +68,7 @@ function init() {
 	window.addEventListener('resize', onWindowResize);
 	setupRATK();
 	setupScene();
-	// setupMenu();
+	setupMenu();
 }
 
 /**
@@ -88,48 +89,24 @@ function setupScene() {
  * The toolbar should always be visible to the user regardless fo their location
  * Therefore the toolbar "follows" the user camera around, or it could be set as a child of the user camera
  */
-// function setupMenu() {
-//     // Create the toolbar as a thin, semitransparent box
-//     const toolbarGeometry = new BoxGeometry(1, 0.1, 0.01); // Adjust size as needed
-//     const toolbarMaterial = new MeshBasicMaterial({
-//         color: 0xaaaaaa, // Grey color
-//         transparent: true,
-//         opacity: 0.5
-//     });
+function setupMenu() {
+    // Create the toolbar as a thin, semitransparent box
+    const toolbarGeometry = new BoxGeometry(1, 0.1, 0.01); // Adjust size as needed
+    const toolbarMaterial = new MeshBasicMaterial({
+        color: 0xaaaaaa, // Grey color
+        transparent: true,
+        opacity: 0.5
+    });
 
-// 	uiGroup = new Group();
-// 	scene.add(uiGroup);
+	uiGroup = new Group();
+	scene.add(uiGroup);
 
-//     const toolbar = new Mesh(toolbarGeometry, toolbarMaterial);
-// 	uiGroup.add(toolbar);
+    const toolbar = new Mesh(toolbarGeometry, toolbarMaterial);
+	uiGroup.add(toolbar);
 
-//     // Add toolbar as a child of the camera so it always follows the user
-//     toolbar.position.set(0, -1, -2); // Adjust position relative to camera
-
-//     // Define shapes with their respective geometries and colors
-//     const shapes = [
-//         { geometry: BoxGeometry, color: 0xff0000 }, // red box
-//         { geometry: SphereGeometry, color: 0x00ff00 }, // green sphere
-//         { geometry: CylinderGeometry, color: 0x0000ff }, // blue cylinder
-//         // { geometry: ConeGeometry, color: 0xffff00 } // yellow cone
-//     ];
-
-//     // Create the shapes and add them to the toolbar
-//     shapes.forEach((shape, index) => {
-// 		let geometry;
-// 		if (shape.geometry == SphereGeometry) {
-// 			geometry = new shape.geometry(0.1); // Adjust size as needed
-// 		} else {
-// 			geometry = new shape.geometry(0.1, 0.1, 0.1); // Adjust size as needed
-// 		}
-//         const material = new MeshBasicMaterial({ color: shape.color });
-//         const mesh = new Mesh(geometry, material);
-
-//         // Position each shape on the toolbar
-//         mesh.position.x = -0.35 + index * 0.2; // This positions shapes with equal spacing
-//         toolbar.add(mesh);
-//     });
-// }
+    // Add toolbar as a child of the camera so it always follows the user
+    toolbar.position.set(0, -1, -2); // Adjust position relative to camera
+}
 
 /**
  * Sets up the audio engine. Must be done after the camera is setup.
@@ -293,6 +270,10 @@ function handleSelectStart(e) {
 				else if (annotationObject.state === "playing") {
 					annotationObject.setState("complete");
 				}
+
+				const text = getUserText(annotationObject.username);
+				updateTextUi(annotationObject.username, text);
+
 				return;
 			}
 		}
@@ -405,28 +386,32 @@ function animate() {
 /**
  * Updates UI to keep it in front of the camera. Call from render loop.
  */
-// function updateUi() {
-// 	const xrManager = renderer.xr;
-// 	const session = xrManager.getSession();
-// 	if (!session) {
-// 		return;
-// 	}
+function updateUi() {
+	const xrManager = renderer.xr;
+	const session = xrManager.getSession();
+	if (!session) {
+		return;
+	}
 
-// 	// get camera pose from xrManager
-// 	const referenceSpace = xrManager.getReferenceSpace();
-// 	const frame = xrManager.getFrame();
-// 	const pose = frame.getViewerPose(referenceSpace);
-// 	if (pose) {
-// 		const headsetMatrix = new Matrix4().fromArray(
-// 			pose.views[0].transform.matrix,
-// 		);
-// 		headsetMatrix.decompose(
-// 			uiGroup.position,
-// 			uiGroup.quaternion,
-// 			uiGroup.scale,
-// 		);
-// 	}
-// }
+	// get camera pose from xrManager
+	const referenceSpace = xrManager.getReferenceSpace();
+	const frame = xrManager.getFrame();
+	const pose = frame.getViewerPose(referenceSpace);
+	if (pose) {
+		const headsetMatrix = new Matrix4().fromArray(
+			pose.views[0].transform.matrix,
+		);
+		headsetMatrix.decompose(
+			uiGroup.position,
+			uiGroup.quaternion,
+			uiGroup.scale,
+		);
+	}
+}
+
+const updateTextUi = (username, text) => {
+
+}
 
 /**
  * Render loop for the scene, updating AR functionalities.
@@ -436,7 +421,7 @@ function render() {
 	ratk.update();
 	updateSemanticLabels();
 	window.audioEngine.update();
-	// updateUi();
+	updateUi();
 
 	for (const annotationObject of annotationObjects) {
 		annotationObject.update();
