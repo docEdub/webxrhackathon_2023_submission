@@ -2,7 +2,7 @@ import './styles/index.css';
 
 import { Auth, Amplify } from 'aws-amplify';
 import amplifyConfig from './amplifyconfigure';
-import { testAnnotations } from './cloud';
+// import { testAnnotations } from './cloud';
 import { fetchPreSignedUrl, fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
 import { startPlacingAnnotationObject } from './annotation_object_placement';
@@ -27,7 +27,6 @@ import {
 	CylinderGeometry,
 	// ConeGeometry
 } from 'three';
-import * as Tone from 'tone';
 
 import { Text } from 'troika-three-text';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
@@ -36,7 +35,7 @@ Amplify.configure(amplifyConfig);
 
 // Global variables for scene components
 
-let camera, audioEngine, scene, renderer, controller, uiGroup;
+let camera, scene, renderer, controller, uiGroup;
 let ratk; // Instance of Reality Accelerator
 let pendingAnchorData = null;
 let primaryAnchor = null;
@@ -127,7 +126,7 @@ function setupMenu() {
  * Sets up the audio engine. Must be done after the camera is setup.
  */
 function setupAudioEngine() {
-	audioEngine = new AudioEngine(camera);
+	window.audioEngine = new AudioEngine(camera);
 }
 
 /**
@@ -414,12 +413,6 @@ function buildAnchorMarker(anchor, isRecovered) {
 	console.log(
 		`anchor created (id: ${anchor.anchorID}, isPersistent: ${anchor.isPersistent}, isRecovered: ${isRecovered})`,
 	);
-	const synth = new Tone.Synth().toDestination();
-	// const now = Tone.now()
-	const notes = ["C4", "E4", "G4"];
-	const randomIndex = Math.floor(Math.random() * notes.length);
-	const randomNote = notes[randomIndex];
-	synth.triggerAttack(randomNote, "8n")
 }
 
 /**
@@ -531,7 +524,7 @@ export async function recordAndUploadWebMAudio() {
 
     const audioUrls = await fetchAllAudioFiles();
 	for (let audioUrl of audioUrls) {
-		const audioSource = audioEngine.createSource();
+		const audioSource = window.audioEngine.createSource();
 
 		console.log("Fetching audio from " + audioUrl);
 		const response = await fetch(audioUrl);
@@ -556,5 +549,5 @@ export async function recordAndUploadWebMAudio() {
  **/
  (async () => {
      //await testAudio();
-     await testAnnotations();
+    //  await testAnnotations();
  })();

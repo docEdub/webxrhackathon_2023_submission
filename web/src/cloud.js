@@ -56,6 +56,7 @@ export async function putUserAnnotation(annotationData) {
             method: 'PUT',
             body: JSON.stringify(annotationData),
         });
+        console.log("Put Annotation Response:", JSON.stringify(response, null, 2));
         return response.status === 200;
     } catch (err) {
         console.error('Failed to put user annotation:', err.message);
@@ -111,6 +112,19 @@ export async function fetchAndPlayWebMAudioByUser() {
             console.error('Error playing audio:', error);
         });
 
+    } catch (error) {
+        console.error('Failed to fetch and play audio:', error);
+    }
+}
+
+export async function fetchAudioUrlByUser(username) {
+    try {
+        // Construct the asset key using the username and file name
+        const assetKey = `${username}/sound.webm`;
+
+        // Fetch the pre-signed URL for the audio file
+        const preSignedUrl = await fetchPreSignedUrl(assetKey, 'GET');
+        return preSignedUrl;
     } catch (error) {
         console.error('Failed to fetch and play audio:', error);
     }
