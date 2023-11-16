@@ -1,3 +1,19 @@
+# See Through Sound
+Empowers anyone to create persistent multimodal annotations anchored to a room that are available to other users to experience. We use the power of AWS cloud to automatically translate spatial audio annotations into a text.
+
+Application, Social
+WebXR: Three.js + Reality Accelerator Toolkit
+Features: passthrough, spatial anchors, persistent anchors, mesh detection, plane detection
+
+States of the annotation recording objects:
+
+Placed #ffff00 YELLOW
+Recording #ff0000 RED
+Recording-done: #00ffff CYAN
+Complete: #ff00ff; PURPLE
+Playing: #00ff00; GREEN
+Error: #aaaaaa; GRAY
+
 ## Experience Setup - to be done by "Team B Flats"
 1) Ensure the headset is charged and powered on.
 2) Go to settings > physical space > space setup > "Set Up"
