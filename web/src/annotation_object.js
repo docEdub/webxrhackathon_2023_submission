@@ -6,7 +6,7 @@ import {
     Group,
     Mesh,
     MeshBasicMaterial,
-	SphereGeometry,
+	TorusGeometry,
 } from 'three';
 
 export class AnnotationObject {
@@ -16,13 +16,15 @@ export class AnnotationObject {
         group.quaternion.copy(quaternion);
         anchor.add(group);
         group.position.sub(anchor.position);
+        group.scale.set(0.5, 0.5, 0.5);
 
-        const geometry = new SphereGeometry(0.5);
+        const geometry = new TorusGeometry(0.4, 0.1, 16, 64);
         const material = new MeshBasicMaterial({color: 0x222222, side: DoubleSide});
-        const sphere = new Mesh(geometry, material);
-        sphere.annotationObject = this;
-        sphere.scale.y = 0.001;
-        group.add(sphere);
+        const mesh = new Mesh(geometry, material);
+        mesh.annotationObject = this;
+        mesh.rotation.x = Math.PI / 2;
+        mesh.scale.z = 0.001;
+        group.add(mesh);
 
         loadAsset('gltf', 'assets/disk.glb', (gltf) => {
             console.log("Loaded disk glb: ", gltf);
@@ -43,7 +45,7 @@ export class AnnotationObject {
         this._group = group;
         this._material = material;
         this._scene = scene;
-        this._sphere = sphere;
+        this._mesh = mesh;
     }
 
     dispose() {
