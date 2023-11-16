@@ -9,6 +9,8 @@ import {
 	TorusGeometry,
 } from 'three';
 
+export const annotationObjects = [];
+
 export class AnnotationObject {
     constructor(scene, anchor, position, quaternion) {
         const group = new Group();
@@ -38,20 +40,26 @@ export class AnnotationObject {
             firstChild.rotation.set(0, 0, 0);
 
             group.add(gltf.scene);
+
+            this._gltf = gltf.scene;
         });
 
         this._anchor = anchor;
         this._geometry = geometry;
         this._group = group;
         this._material = material;
-        this._scene = scene;
         this._mesh = mesh;
+        this._scene = scene;
+
+        annotationObjects.push(this);
     }
 
     dispose() {
         this._geometry.dispose();
         this._material.dispose();
         this._anchor.remove(this._group);
+
+        annotationObjects.splice(annotationObjects.indexOf(this), 1);
     }
 
     setState(state) {
@@ -74,6 +82,12 @@ export class AnnotationObject {
         }
         else if (state == "error") {
             this._material.color.setHex(0xaaaaaa);
+        }
+    }
+
+    update() {
+        if (this.state == "playing") {
+            this._gltf.rotation.y += 0.1;
         }
     }
 }

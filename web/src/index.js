@@ -6,6 +6,7 @@ import { fetchAllPreSignedUrls } from './fetchurl';
 import { AudioEngine } from './audio';
 import { startCreatingAnnotationObject } from './annotation_object_creation';
 import { loadAnnotationObjects } from './load_annotation_objects';
+import { annotationObjects } from './annotation_object';
 
 import { ARButton, RealityAccelerator } from 'ratk';
 import {
@@ -418,6 +419,11 @@ function render() {
 	updateSemanticLabels();
 	window.audioEngine.update();
 	updateUi();
+
+	for (const annotationObject of annotationObjects) {
+		annotationObject.update();
+	}
+
 	renderer.render(scene, camera);
 }
 
